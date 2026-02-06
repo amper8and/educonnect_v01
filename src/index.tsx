@@ -633,16 +633,647 @@ app.get('/dashboard', (c) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Dashboard - EduConnect</title>
         <link href="/static/css/design-system.css" rel="stylesheet">
+        <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="bg-gray-100">
         <div class="container mx-auto p-8">
             <div class="card text-center">
                 <img src="/static/images/logos/mtn-educonnect-logo.png" alt="EduConnect" style="height: 120px; margin: 0 auto 2rem;">
                 <h1 class="mb-4">Welcome to EduConnect!</h1>
-                <p class="text-secondary mb-4">Dashboard coming soon...</p>
-                <a href="/" class="btn btn-primary">Back to Login</a>
+                <p class="text-secondary mb-6">Complete your profile to get started</p>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <a href="/onboarding" class="btn btn-primary">
+                        <i class="fas fa-user-check mr-2"></i> Complete Profile
+                    </a>
+                    <a href="/" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Login
+                    </a>
+                </div>
             </div>
         </div>
+    </body>
+    </html>
+  `)
+})
+
+// Onboarding wizard
+app.get('/onboarding', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Complete Your Profile - EduConnect</title>
+        <link href="/static/css/design-system.css" rel="stylesheet">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+        <style>
+            .onboarding-container {
+                min-height: 100vh;
+                background-color: #F9FAFB;
+                padding: 2rem 1rem;
+            }
+            
+            .onboarding-card {
+                max-width: 800px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 1rem;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+            }
+            
+            .stepper {
+                display: flex;
+                justify-content: space-between;
+                padding: 2rem;
+                background: linear-gradient(135deg, #FFCB00 0%, #E6B800 100%);
+                position: relative;
+            }
+            
+            .step {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                position: relative;
+                z-index: 1;
+            }
+            
+            .step-number {
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                background: rgba(0, 0, 0, 0.2);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                font-size: 1.25rem;
+                margin-bottom: 0.5rem;
+                transition: all 0.3s;
+            }
+            
+            .step.active .step-number {
+                background: #000;
+                transform: scale(1.1);
+            }
+            
+            .step.completed .step-number {
+                background: #10B981;
+            }
+            
+            .step-label {
+                font-size: 0.875rem;
+                font-weight: 600;
+                color: rgba(0, 0, 0, 0.7);
+                text-align: center;
+            }
+            
+            .step.active .step-label {
+                color: #000;
+            }
+            
+            .step-content {
+                padding: 3rem 2rem;
+            }
+            
+            .form-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .form-row.full {
+                grid-template-columns: 1fr;
+            }
+            
+            .role-options {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .role-card {
+                padding: 1.5rem;
+                border: 2px solid #E5E7EB;
+                border-radius: 0.75rem;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            
+            .role-card:hover {
+                border-color: #FFCB00;
+                background: #FFFBF0;
+            }
+            
+            .role-card.selected {
+                border-color: #FFCB00;
+                background: #FFCB00;
+                color: #000;
+            }
+            
+            .role-card i {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+                display: block;
+            }
+            
+            .upload-zone {
+                border: 2px dashed #D1D5DB;
+                border-radius: 0.75rem;
+                padding: 3rem 2rem;
+                text-align: center;
+                transition: all 0.2s;
+                cursor: pointer;
+                margin-bottom: 1.5rem;
+            }
+            
+            .upload-zone:hover {
+                border-color: #FFCB00;
+                background: #FFFBF0;
+            }
+            
+            .upload-zone.dragover {
+                border-color: #FFCB00;
+                background: #FFCB00;
+                color: #000;
+            }
+            
+            .upload-icon {
+                font-size: 3rem;
+                color: #9CA3AF;
+                margin-bottom: 1rem;
+            }
+            
+            .upload-zone.dragover .upload-icon {
+                color: #000;
+            }
+            
+            .file-preview {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                padding: 1rem;
+                background: #F3F4F6;
+                border-radius: 0.5rem;
+                margin-bottom: 1rem;
+            }
+            
+            .actions {
+                display: flex;
+                justify-content: space-between;
+                padding: 2rem;
+                border-top: 1px solid #E5E7EB;
+            }
+            
+            .success-screen {
+                text-align: center;
+                padding: 4rem 2rem;
+            }
+            
+            .success-icon {
+                width: 100px;
+                height: 100px;
+                margin: 0 auto 2rem;
+                background: #10B981;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 4rem;
+                color: white;
+            }
+            
+            @media (max-width: 768px) {
+                .stepper {
+                    padding: 1.5rem 1rem;
+                }
+                
+                .step-label {
+                    font-size: 0.75rem;
+                }
+                
+                .step-number {
+                    width: 40px;
+                    height: 40px;
+                    font-size: 1rem;
+                }
+                
+                .form-row {
+                    grid-template-columns: 1fr;
+                }
+                
+                .role-options {
+                    grid-template-columns: 1fr;
+                }
+                
+                .step-content {
+                    padding: 2rem 1.5rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="onboarding-container">
+            <div class="onboarding-card">
+                <!-- Progress Stepper -->
+                <div class="stepper">
+                    <div class="step active" id="step-indicator-1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Identity</div>
+                    </div>
+                    <div class="step" id="step-indicator-2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Authorization</div>
+                    </div>
+                    <div class="step" id="step-indicator-3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Verification</div>
+                    </div>
+                    <div class="step" id="step-indicator-4">
+                        <div class="step-number">4</div>
+                        <div class="step-label">Documents</div>
+                    </div>
+                </div>
+                
+                <!-- Step 1: Identity -->
+                <div id="step-1" class="step-content">
+                    <h2 class="mb-2">Complete Your Profile</h2>
+                    <p class="text-secondary mb-4">Step 1 of 4 - Personal Information</p>
+                    
+                    <form id="form-step-1">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">First Name *</label>
+                                <input type="text" name="firstName" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Last Name *</label>
+                                <input type="text" name="lastName" class="form-input" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row full">
+                            <div class="form-group">
+                                <label class="form-label">South African ID Number *</label>
+                                <input 
+                                    type="text" 
+                                    name="idNumber" 
+                                    class="form-input" 
+                                    placeholder="13-digit ID number"
+                                    pattern="[0-9]{13}"
+                                    maxlength="13"
+                                    required
+                                >
+                                <small class="text-secondary">Must be 13 digits</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row full">
+                            <div class="form-group">
+                                <label class="form-label">Date of Birth *</label>
+                                <input type="date" name="dateOfBirth" class="form-input" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Step 2: Authorization -->
+                <div id="step-2" class="step-content" style="display: none;">
+                    <h2 class="mb-2">Authorization</h2>
+                    <p class="text-secondary mb-4">Step 2 of 4 - Role & Institution</p>
+                    
+                    <form id="form-step-2">
+                        <div class="form-row full">
+                            <div class="form-group">
+                                <label class="form-label">Institution Name *</label>
+                                <select name="institution" class="form-input" required>
+                                    <option value="">Select your institution</option>
+                                    <option value="school1">Johannesburg High School</option>
+                                    <option value="school2">Cape Town Primary</option>
+                                    <option value="school3">Pretoria Secondary</option>
+                                    <option value="school4">Durban College</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Your Role *</label>
+                            <div class="role-options">
+                                <div class="role-card" data-role="student">
+                                    <i class="fas fa-user-graduate"></i>
+                                    <div>Student</div>
+                                </div>
+                                <div class="role-card" data-role="teacher">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                    <div>Teacher</div>
+                                </div>
+                                <div class="role-card" data-role="administrator">
+                                    <i class="fas fa-user-tie"></i>
+                                    <div>Administrator</div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="role" required>
+                        </div>
+                        
+                        <div class="form-row full">
+                            <div class="form-group">
+                                <label class="form-label" id="id-label">Student ID / Staff ID *</label>
+                                <input type="text" name="staffId" class="form-input" placeholder="Enter your ID" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Step 3: Verification -->
+                <div id="step-3" class="step-content" style="display: none;">
+                    <h2 class="mb-2">Verification</h2>
+                    <p class="text-secondary mb-4">Step 3 of 4 - Proof of Identity</p>
+                    
+                    <form id="form-step-3">
+                        <div class="upload-zone" id="selfie-upload-zone">
+                            <i class="fas fa-camera upload-icon"></i>
+                            <h3 class="mb-2">Upload Selfie</h3>
+                            <p class="text-secondary mb-3">Take a clear photo of your face</p>
+                            <p class="text-secondary"><small>JPG or PNG • Max 5MB</small></p>
+                            <input type="file" id="selfie-input" name="selfie" accept="image/*" style="display: none;" required>
+                        </div>
+                        <div id="selfie-preview"></div>
+                    </form>
+                </div>
+                
+                <!-- Step 4: Documents -->
+                <div id="step-4" class="step-content" style="display: none;">
+                    <h2 class="mb-2">Documents</h2>
+                    <p class="text-secondary mb-4">Step 4 of 4 - Required Documents</p>
+                    
+                    <form id="form-step-4">
+                        <div class="form-group">
+                            <label class="form-label">ID Document *</label>
+                            <div class="upload-zone" id="id-upload-zone">
+                                <i class="fas fa-id-card upload-icon"></i>
+                                <h4 class="mb-2">Upload ID Document</h4>
+                                <p class="text-secondary mb-2">Drag & drop or click to upload</p>
+                                <p class="text-secondary"><small>PDF, JPG, PNG • Max 5MB</small></p>
+                                <input type="file" id="id-input" name="idDocument" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" required>
+                            </div>
+                            <div id="id-preview"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Proof of Residence *</label>
+                            <div class="upload-zone" id="residence-upload-zone">
+                                <i class="fas fa-home upload-icon"></i>
+                                <h4 class="mb-2">Upload Proof of Residence</h4>
+                                <p class="text-secondary mb-2">Drag & drop or click to upload</p>
+                                <p class="text-secondary"><small>PDF, JPG, PNG • Max 5MB</small></p>
+                                <input type="file" id="residence-input" name="proofOfResidence" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" required>
+                            </div>
+                            <div id="residence-preview"></div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Success Screen -->
+                <div id="step-success" class="step-content" style="display: none;">
+                    <div class="success-screen">
+                        <div class="success-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <h1 class="mb-3">Profile Complete!</h1>
+                        <div class="mb-4">
+                            <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: #FEF3C7; border-radius: 0.5rem;">
+                                <i class="fas fa-clock" style="color: #F59E0B;"></i>
+                                <span style="color: #92400E; font-weight: 600;">Verification in progress</span>
+                            </div>
+                        </div>
+                        <p class="text-secondary mb-2">Thank you for submitting your documents.</p>
+                        <p class="text-secondary mb-4">Your profile is under review and will be verified within <strong>24-48 hours</strong>.</p>
+                        <a href="/dashboard" class="btn btn-primary">Go to Dashboard</a>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="actions" id="action-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="saveAndExit()">
+                        <i class="fas fa-save mr-2"></i> Save & Exit
+                    </button>
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="button" class="btn btn-outline" id="btn-back" onclick="prevStep()" style="display: none;">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button type="button" class="btn btn-primary" id="btn-continue" onclick="nextStep()">
+                            Continue <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            let currentStep = 1;
+            const totalSteps = 4;
+            const formData = {};
+            
+            // Role selection
+            document.querySelectorAll('.role-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    document.querySelector('input[name="role"]').value = this.dataset.role;
+                    
+                    // Update ID label based on role
+                    const label = document.getElementById('id-label');
+                    const role = this.dataset.role;
+                    if (role === 'student') {
+                        label.textContent = 'Student ID *';
+                    } else if (role === 'teacher') {
+                        label.textContent = 'Staff ID *';
+                    } else {
+                        label.textContent = 'Administrator ID *';
+                    }
+                });
+            });
+            
+            // File upload handlers
+            setupFileUpload('selfie-upload-zone', 'selfie-input', 'selfie-preview', 'image/*');
+            setupFileUpload('id-upload-zone', 'id-input', 'id-preview', '.pdf,.jpg,.jpeg,.png');
+            setupFileUpload('residence-upload-zone', 'residence-input', 'residence-preview', '.pdf,.jpg,.jpeg,.png');
+            
+            function setupFileUpload(zoneId, inputId, previewId, accept) {
+                const zone = document.getElementById(zoneId);
+                const input = document.getElementById(inputId);
+                const preview = document.getElementById(previewId);
+                
+                zone.addEventListener('click', () => input.click());
+                
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('dragover');
+                });
+                
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('dragover');
+                });
+                
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('dragover');
+                    const file = e.dataTransfer.files[0];
+                    handleFile(file, input, preview, zone);
+                });
+                
+                input.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    handleFile(file, input, preview, zone);
+                });
+            }
+            
+            function handleFile(file, input, preview, zone) {
+                if (!file) return;
+                
+                // Validate file size (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size must be less than 5MB');
+                    return;
+                }
+                
+                // Show preview
+                preview.innerHTML = \`
+                    <div class="file-preview">
+                        <i class="fas fa-file text-2xl" style="color: #FFCB00;"></i>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600;">\${file.name}</div>
+                            <div class="text-secondary" style="font-size: 0.875rem;">\${(file.size / 1024).toFixed(1)} KB</div>
+                        </div>
+                        <i class="fas fa-check-circle text-2xl" style="color: #10B981;"></i>
+                    </div>
+                \`;
+                
+                zone.style.display = 'none';
+            }
+            
+            // Navigation
+            function nextStep() {
+                // Validate current step
+                const form = document.getElementById('form-step-' + currentStep);
+                if (form && !form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+                
+                // Save form data
+                if (form) {
+                    const data = new FormData(form);
+                    for (let [key, value] of data.entries()) {
+                        formData[key] = value;
+                    }
+                }
+                
+                if (currentStep === totalSteps) {
+                    // Submit all data
+                    submitOnboarding();
+                    return;
+                }
+                
+                // Move to next step
+                document.getElementById('step-' + currentStep).style.display = 'none';
+                document.getElementById('step-indicator-' + currentStep).classList.remove('active');
+                document.getElementById('step-indicator-' + currentStep).classList.add('completed');
+                
+                currentStep++;
+                
+                document.getElementById('step-' + currentStep).style.display = 'block';
+                document.getElementById('step-indicator-' + currentStep).classList.add('active');
+                
+                // Update buttons
+                document.getElementById('btn-back').style.display = currentStep > 1 ? 'block' : 'none';
+                document.getElementById('btn-continue').innerHTML = currentStep === totalSteps 
+                    ? '<i class="fas fa-check mr-2"></i> Submit' 
+                    : 'Continue <i class="fas fa-arrow-right ml-2"></i>';
+            }
+            
+            function prevStep() {
+                if (currentStep <= 1) return;
+                
+                document.getElementById('step-' + currentStep).style.display = 'none';
+                document.getElementById('step-indicator-' + currentStep).classList.remove('active');
+                
+                currentStep--;
+                
+                document.getElementById('step-' + currentStep).style.display = 'block';
+                document.getElementById('step-indicator-' + currentStep).classList.remove('completed');
+                document.getElementById('step-indicator-' + currentStep).classList.add('active');
+                
+                // Update buttons
+                document.getElementById('btn-back').style.display = currentStep > 1 ? 'block' : 'none';
+                document.getElementById('btn-continue').innerHTML = 'Continue <i class="fas fa-arrow-right ml-2"></i>';
+            }
+            
+            async function submitOnboarding() {
+                // Show loading
+                const btn = document.getElementById('btn-continue');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner animate-spin mr-2"></i> Submitting...';
+                
+                try {
+                    const response = await fetch('/api/onboarding/submit', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Show success screen
+                        document.getElementById('step-' + currentStep).style.display = 'none';
+                        document.getElementById('step-indicator-' + currentStep).classList.remove('active');
+                        document.getElementById('step-indicator-' + currentStep).classList.add('completed');
+                        document.getElementById('step-success').style.display = 'block';
+                        document.getElementById('action-buttons').style.display = 'none';
+                    } else {
+                        alert('Error: ' + data.message);
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-check mr-2"></i> Submit';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Submission failed. Please try again.');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check mr-2"></i> Submit';
+                }
+            }
+            
+            function saveAndExit() {
+                if (confirm('Save your progress and exit? You can continue later.')) {
+                    // Save to localStorage
+                    localStorage.setItem('onboardingProgress', JSON.stringify({
+                        step: currentStep,
+                        data: formData
+                    }));
+                    window.location.href = '/dashboard';
+                }
+            }
+            
+            // Load saved progress
+            window.addEventListener('load', () => {
+                const saved = localStorage.getItem('onboardingProgress');
+                if (saved) {
+                    const progress = JSON.parse(saved);
+                    if (confirm('Continue from where you left off?')) {
+                        // TODO: Restore progress
+                    }
+                }
+            });
+        </script>
     </body>
     </html>
   `)
@@ -700,6 +1331,32 @@ app.post('/api/auth/verify-otp', async (c) => {
       message: 'Invalid OTP code'
     }, 400)
   }
+})
+
+// API: Submit onboarding
+app.post('/api/onboarding/submit', async (c) => {
+  const body = await c.req.json()
+  
+  // Log onboarding data (demo mode)
+  console.log('\n========================================')
+  console.log('📝 ONBOARDING SUBMISSION')
+  console.log('========================================')
+  console.log('Name:', body.firstName, body.lastName)
+  console.log('ID Number:', body.idNumber)
+  console.log('Date of Birth:', body.dateOfBirth)
+  console.log('Institution:', body.institution)
+  console.log('Role:', body.role)
+  console.log('Staff ID:', body.staffId)
+  console.log('Status: Pending Verification')
+  console.log('Expected Review Time: 24-48 hours')
+  console.log('========================================\n')
+  
+  return c.json({
+    success: true,
+    message: 'Onboarding completed successfully',
+    status: 'pending_verification',
+    estimatedReviewTime: '24-48 hours'
+  })
 })
 
 // Health check
