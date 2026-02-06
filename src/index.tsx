@@ -668,6 +668,1043 @@ app.get('/dashboard', (c) => {
   `)
 })
 
+// Solution Builder
+app.get('/solution-builder', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Solution Builder - EduConnect</title>
+        <link href="/static/css/design-system.css" rel="stylesheet">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+        <style>
+            body {
+                margin: 0;
+                font-family: 'MTN Brighter Sans', sans-serif;
+                overflow: hidden;
+            }
+            
+            .builder-container {
+                display: grid;
+                grid-template-columns: 240px 1fr 360px;
+                grid-template-rows: 64px 1fr;
+                height: 100vh;
+                background: #F9FAFB;
+            }
+            
+            /* Header */
+            .header {
+                grid-column: 1 / -1;
+                background: white;
+                border-bottom: 1px solid #E5E7EB;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 1.5rem;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                z-index: 100;
+            }
+            
+            .header-left {
+                display: flex;
+                align-items: center;
+                gap: 2rem;
+            }
+            
+            .logo-section {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                font-weight: 700;
+                font-size: 1.125rem;
+            }
+            
+            .logo-icon {
+                width: 32px;
+                height: 32px;
+                background: #FFCB00;
+                border-radius: 6px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.25rem;
+            }
+            
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+            
+            .nav-link {
+                padding: 0.5rem 1rem;
+                color: #6B7280;
+                text-decoration: none;
+                font-weight: 500;
+                transition: color 0.2s;
+            }
+            
+            .nav-link:hover {
+                color: #000;
+            }
+            
+            .nav-link.active {
+                color: #000;
+                border-bottom: 2px solid #FFCB00;
+            }
+            
+            .icon-button {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #F3F4F6;
+                border: none;
+                cursor: pointer;
+                transition: background 0.2s;
+            }
+            
+            .icon-button:hover {
+                background: #E5E7EB;
+            }
+            
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #FFCB00, #E6B800);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                color: #000;
+                cursor: pointer;
+            }
+            
+            /* Left Sidebar - Build History */
+            .left-sidebar {
+                background: white;
+                border-right: 1px solid #E5E7EB;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .sidebar-header {
+                padding: 1.5rem 1rem;
+                border-bottom: 1px solid #E5E7EB;
+            }
+            
+            .sidebar-title {
+                font-size: 0.75rem;
+                font-weight: 700;
+                color: #6B7280;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                margin-bottom: 1rem;
+            }
+            
+            .create-build-btn {
+                width: 100%;
+                padding: 0.75rem 1rem;
+                background: #FFCB00;
+                border: none;
+                border-radius: 0.5rem;
+                font-weight: 700;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                transition: background 0.2s;
+            }
+            
+            .create-build-btn:hover {
+                background: #E6B800;
+            }
+            
+            .build-list {
+                flex: 1;
+                padding: 0.5rem;
+            }
+            
+            .build-item {
+                padding: 0.75rem;
+                margin-bottom: 0.5rem;
+                border-radius: 0.5rem;
+                cursor: pointer;
+                transition: background 0.2s;
+                border: 1px solid transparent;
+            }
+            
+            .build-item:hover {
+                background: #F9FAFB;
+            }
+            
+            .build-item.active {
+                background: #FFFBF0;
+                border-color: #FFCB00;
+            }
+            
+            .build-item-header {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                margin-bottom: 0.5rem;
+            }
+            
+            .build-icon {
+                width: 32px;
+                height: 32px;
+                background: #F3F4F6;
+                border-radius: 6px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+            
+            .build-details {
+                flex: 1;
+                margin-left: 0.75rem;
+            }
+            
+            .build-name {
+                font-weight: 600;
+                font-size: 0.875rem;
+                color: #111827;
+                margin-bottom: 0.25rem;
+            }
+            
+            .build-meta {
+                font-size: 0.75rem;
+                color: #6B7280;
+            }
+            
+            .status-badge {
+                display: inline-block;
+                padding: 0.25rem 0.5rem;
+                border-radius: 0.25rem;
+                font-size: 0.75rem;
+                font-weight: 600;
+                margin-top: 0.5rem;
+            }
+            
+            .status-active {
+                background: #DBEAFE;
+                color: #1E40AF;
+            }
+            
+            .status-saved {
+                background: #D1FAE5;
+                color: #065F46;
+            }
+            
+            .status-offered {
+                background: #FEF3C7;
+                color: #92400E;
+            }
+            
+            /* Center Panel - Main Content */
+            .main-content {
+                overflow-y: auto;
+                padding: 2rem;
+            }
+            
+            .progress-stepper {
+                display: flex;
+                gap: 1rem;
+                margin-bottom: 2rem;
+                background: white;
+                padding: 1.5rem;
+                border-radius: 0.75rem;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+            
+            .step-item {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                position: relative;
+            }
+            
+            .step-item:not(:last-child)::after {
+                content: '';
+                position: absolute;
+                right: -0.5rem;
+                width: 100%;
+                height: 2px;
+                background: #E5E7EB;
+                top: 20px;
+                z-index: 0;
+            }
+            
+            .step-item.completed::after {
+                background: #FFCB00;
+            }
+            
+            .step-number {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: #F3F4F6;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                color: #9CA3AF;
+                z-index: 1;
+                flex-shrink: 0;
+            }
+            
+            .step-item.active .step-number {
+                background: #FFCB00;
+                color: #000;
+            }
+            
+            .step-item.completed .step-number {
+                background: #10B981;
+                color: white;
+            }
+            
+            .step-info {
+                flex: 1;
+            }
+            
+            .step-name {
+                font-weight: 600;
+                font-size: 0.875rem;
+                color: #6B7280;
+            }
+            
+            .step-item.active .step-name {
+                color: #000;
+            }
+            
+            .config-card {
+                background: white;
+                border-radius: 0.75rem;
+                padding: 2rem;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                margin-bottom: 2rem;
+            }
+            
+            .card-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+            }
+            
+            .card-subtitle {
+                color: #6B7280;
+                margin-bottom: 2rem;
+            }
+            
+            .section-header {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 1.5rem;
+                padding-bottom: 0.75rem;
+                border-bottom: 1px solid #E5E7EB;
+            }
+            
+            .section-icon {
+                width: 40px;
+                height: 40px;
+                background: #FFFBF0;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #000;
+            }
+            
+            .section-title {
+                font-weight: 700;
+                font-size: 1.125rem;
+            }
+            
+            .form-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+                margin-bottom: 2rem;
+            }
+            
+            .form-grid.full {
+                grid-template-columns: 1fr;
+            }
+            
+            .location-section {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                gap: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .map-preview {
+                width: 150px;
+                height: 150px;
+                background: #E5E7EB;
+                border-radius: 0.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #9CA3AF;
+            }
+            
+            .coverage-options {
+                display: flex;
+                gap: 1rem;
+                margin-top: 1rem;
+            }
+            
+            .coverage-option {
+                flex: 1;
+                padding: 1rem;
+                border: 2px solid #E5E7EB;
+                border-radius: 0.5rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            
+            .coverage-option:hover {
+                border-color: #FFCB00;
+                background: #FFFBF0;
+            }
+            
+            .coverage-option.selected {
+                border-color: #FFCB00;
+                background: #FFFBF0;
+            }
+            
+            .coverage-radio {
+                width: 20px;
+                height: 20px;
+                border: 2px solid #D1D5DB;
+                border-radius: 50%;
+                position: relative;
+            }
+            
+            .coverage-option.selected .coverage-radio {
+                border-color: #FFCB00;
+            }
+            
+            .coverage-option.selected .coverage-radio::after {
+                content: '';
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                background: #FFCB00;
+                border-radius: 50%;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+            
+            .action-bar {
+                display: flex;
+                justify-content: space-between;
+                gap: 1rem;
+                padding-top: 2rem;
+                border-top: 1px solid #E5E7EB;
+            }
+            
+            /* Right Sidebar - AI Assistant */
+            .right-sidebar {
+                background: white;
+                border-left: 1px solid #E5E7EB;
+                display: flex;
+                flex-direction: column;
+                position: relative;
+            }
+            
+            .right-sidebar.collapsed {
+                width: 48px;
+            }
+            
+            .assistant-header {
+                padding: 1.5rem;
+                border-bottom: 1px solid #E5E7EB;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            
+            .assistant-info {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            
+            .assistant-avatar {
+                width: 40px;
+                height: 40px;
+                background: #FFCB00;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                position: relative;
+            }
+            
+            .online-indicator {
+                width: 12px;
+                height: 12px;
+                background: #10B981;
+                border: 2px solid white;
+                border-radius: 50%;
+                position: absolute;
+                bottom: 0;
+                right: 0;
+            }
+            
+            .assistant-name {
+                font-weight: 700;
+            }
+            
+            .assistant-status {
+                font-size: 0.75rem;
+                color: #10B981;
+            }
+            
+            .collapse-btn {
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 0.5rem;
+                color: #6B7280;
+            }
+            
+            .chat-container {
+                flex: 1;
+                overflow-y: auto;
+                padding: 1.5rem;
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .message {
+                display: flex;
+                gap: 0.75rem;
+                animation: slideIn 0.3s ease;
+            }
+            
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            
+            .message-avatar {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: #FFCB00;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.875rem;
+                font-weight: 700;
+                flex-shrink: 0;
+            }
+            
+            .message-content {
+                flex: 1;
+                background: #F9FAFB;
+                padding: 1rem;
+                border-radius: 0.75rem;
+                font-size: 0.875rem;
+                line-height: 1.5;
+            }
+            
+            .message-time {
+                font-size: 0.75rem;
+                color: #9CA3AF;
+                margin-top: 0.25rem;
+            }
+            
+            .recommendation-card {
+                background: #FFFBF0;
+                border: 1px solid #FFCB00;
+                border-radius: 0.5rem;
+                padding: 1rem;
+                margin-top: 0.5rem;
+            }
+            
+            .recommendation-title {
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .recommendation-options {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                margin-top: 0.75rem;
+            }
+            
+            .recommendation-option {
+                padding: 0.75rem;
+                background: white;
+                border-radius: 0.5rem;
+                font-size: 0.875rem;
+            }
+            
+            .option-title {
+                font-weight: 600;
+                margin-bottom: 0.25rem;
+            }
+            
+            .option-detail {
+                color: #6B7280;
+                font-size: 0.75rem;
+            }
+            
+            .chat-input-container {
+                padding: 1rem 1.5rem;
+                border-top: 1px solid #E5E7EB;
+            }
+            
+            .chat-input-wrapper {
+                display: flex;
+                gap: 0.75rem;
+                align-items: flex-end;
+            }
+            
+            .chat-input {
+                flex: 1;
+                padding: 0.75rem 1rem;
+                border: 1px solid #E5E7EB;
+                border-radius: 0.5rem;
+                resize: none;
+                font-family: inherit;
+                font-size: 0.875rem;
+            }
+            
+            .send-btn {
+                padding: 0.75rem 1rem;
+                background: #FFCB00;
+                border: none;
+                border-radius: 0.5rem;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background 0.2s;
+            }
+            
+            .send-btn:hover {
+                background: #E6B800;
+            }
+            
+            .compare-link {
+                margin-top: 0.5rem;
+                font-size: 0.75rem;
+            }
+            
+            .compare-link a {
+                color: #3B82F6;
+                text-decoration: none;
+            }
+            
+            .compare-link a:hover {
+                text-decoration: underline;
+            }
+            
+            /* Mobile Responsive */
+            @media (max-width: 1024px) {
+                .builder-container {
+                    grid-template-columns: 1fr;
+                }
+                
+                .left-sidebar {
+                    position: fixed;
+                    left: -240px;
+                    top: 64px;
+                    bottom: 0;
+                    width: 240px;
+                    z-index: 50;
+                    transition: left 0.3s;
+                }
+                
+                .left-sidebar.open {
+                    left: 0;
+                }
+                
+                .right-sidebar {
+                    position: fixed;
+                    right: -360px;
+                    top: 64px;
+                    bottom: 0;
+                    width: 360px;
+                    z-index: 50;
+                    transition: right 0.3s;
+                }
+                
+                .right-sidebar.open {
+                    right: 0;
+                }
+                
+                .form-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="builder-container">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-left">
+                    <div class="logo-section">
+                        <div class="logo-icon">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <span>EduConnect Solution Builder</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <a href="/dashboard" class="nav-link">Dashboard</a>
+                    <a href="/solution-builder" class="nav-link active">Solutions</a>
+                    <a href="/dashboard" class="nav-link">Reports</a>
+                    <button class="icon-button">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <div class="user-avatar">JM</div>
+                </div>
+            </div>
+            
+            <!-- Left Sidebar - Build History -->
+            <div class="left-sidebar" id="left-sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-title">Recent History</div>
+                    <button class="create-build-btn" onclick="createNewBuild()">
+                        <i class="fas fa-plus"></i>
+                        Create New Build
+                    </button>
+                </div>
+                <div class="build-list">
+                    <div class="build-item active">
+                        <div class="build-item-header">
+                            <div style="display: flex; align-items: flex-start; flex: 1;">
+                                <div class="build-icon">
+                                    <i class="fas fa-folder"></i>
+                                </div>
+                                <div class="build-details">
+                                    <div class="build-name">UCT - Fiber Upgr...</div>
+                                    <div class="build-meta">Edited 2 mins ago</div>
+                                    <span class="status-badge status-active">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="build-item">
+                        <div class="build-item-header">
+                            <div style="display: flex; align-items: flex-start; flex: 1;">
+                                <div class="build-icon">
+                                    <i class="fas fa-folder"></i>
+                                </div>
+                                <div class="build-details">
+                                    <div class="build-name">Pretoria High - D...</div>
+                                    <div class="build-meta">Edited 4 hrs ago</div>
+                                    <span class="status-badge status-saved">Saved</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="build-item">
+                        <div class="build-item-header">
+                            <div style="display: flex; align-items: flex-start; flex: 1;">
+                                <div class="build-icon">
+                                    <i class="fas fa-folder"></i>
+                                </div>
+                                <div class="build-details">
+                                    <div class="build-name">Stellies Wifi Upg...</div>
+                                    <div class="build-meta">Oct 24, 2025</div>
+                                    <span class="status-badge status-offered">Offered</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Progress Stepper -->
+                <div class="progress-stepper">
+                    <div class="step-item completed">
+                        <div class="step-number">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="step-info">
+                            <div class="step-name">Persons</div>
+                        </div>
+                    </div>
+                    <div class="step-item active">
+                        <div class="step-number">2</div>
+                        <div class="step-info">
+                            <div class="step-name">Sites</div>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-info">
+                            <div class="step-name">Assets</div>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-info">
+                            <div class="step-name">Review</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Configuration Card -->
+                <div class="config-card">
+                    <h2 class="card-title">Configure Site Requirements</h2>
+                    <p class="card-subtitle">Enter the connectivity parameters for the primary educational campus.</p>
+                    
+                    <!-- Campus Details -->
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="section-title">Campus Details</div>
+                    </div>
+                    
+                    <form>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Site Name</label>
+                                <input type="text" class="form-input" value="UCT Main Campus" placeholder="Enter site name">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Campus Type</label>
+                                <select class="form-input">
+                                    <option>University / Higher Ed</option>
+                                    <option>High School</option>
+                                    <option>Primary School</option>
+                                    <option>Technical College</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Total Students</label>
+                                <input type="number" class="form-input" value="2500" placeholder="Number of students">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Staff Count</label>
+                                <input type="number" class="form-input" value="450" placeholder="Number of staff">
+                            </div>
+                        </div>
+                        
+                        <!-- Location & Coverage -->
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="section-title">Location & Coverage</div>
+                            <a href="#" style="margin-left: auto; color: #FFCB00; font-size: 0.875rem; text-decoration: none;">Edit coordinates</a>
+                        </div>
+                        
+                        <div class="location-section">
+                            <div>
+                                <div class="form-group">
+                                    <label class="form-label">Address</label>
+                                    <input type="text" class="form-input" value="Rondebosch, Cape Town, 7700" placeholder="Enter address">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Coverage Requirement</label>
+                                    <div class="coverage-options">
+                                        <div class="coverage-option">
+                                            <div class="coverage-radio"></div>
+                                            <div>
+                                                <div style="font-weight: 600; font-size: 0.875rem;">Indoor Only</div>
+                                            </div>
+                                        </div>
+                                        <div class="coverage-option selected">
+                                            <div class="coverage-radio"></div>
+                                            <div>
+                                                <div style="font-weight: 600; font-size: 0.875rem;">Indoor & Outdoor</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 0.75rem; border-radius: 0.5rem; margin-top: 1rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; color: #1E40AF; font-size: 0.875rem;">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span><strong>Based on this location, fiber</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="map-preview">
+                                <i class="fas fa-map text-4xl"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="action-bar">
+                            <button type="button" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left mr-2"></i> Back
+                            </button>
+                            <div style="display: flex; gap: 1rem;">
+                                <button type="button" class="btn btn-outline">Save Draft</button>
+                                <button type="submit" class="btn btn-primary">
+                                    Next Step <i class="fas fa-arrow-right ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Right Sidebar - AI Assistant -->
+            <div class="right-sidebar" id="right-sidebar">
+                <div class="assistant-header">
+                    <div class="assistant-info">
+                        <div class="assistant-avatar">
+                            <span>AI</span>
+                            <div class="online-indicator"></div>
+                        </div>
+                        <div>
+                            <div class="assistant-name">EduAssistant</div>
+                            <div class="assistant-status">● Online</div>
+                        </div>
+                    </div>
+                    <button class="collapse-btn" onclick="toggleAssistant()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="chat-container">
+                    <div class="message">
+                        <div class="message-avatar">AI</div>
+                        <div>
+                            <div class="message-content">
+                                Hello! I see you're configuring a University site. Based on your student count of 2,500, would you like me to suggest bandwidth allocations?
+                                <div class="message-time">10:42 AM</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="message">
+                        <div class="message-avatar" style="background: #E5E7EB; color: #000;">You</div>
+                        <div>
+                            <div class="message-content" style="background: #FFCB00;">
+                                Yes, what's recommended for high video streaming usage?
+                                <div class="message-time">10:44 AM</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="message">
+                        <div class="message-avatar">AI</div>
+                        <div>
+                            <div class="message-content">
+                                For high-density streaming environments, we recommend a dedicated 1Gbps fiber link with redundancy. Here are two options:
+                                <div class="recommendation-card">
+                                    <div class="recommendation-title">
+                                        <i class="fas fa-lightbulb" style="color: #FFCB00;"></i>
+                                        Recommended Packages
+                                    </div>
+                                    <div class="recommendation-options">
+                                        <div class="recommendation-option">
+                                            <div class="option-title">Enterprise Dedicated</div>
+                                            <div class="option-detail">1:1 Contention • 99.9% SLA</div>
+                                        </div>
+                                        <div class="recommendation-option" style="border-left: 3px solid #FFCB00;">
+                                            <div class="option-title">Broadband Business <span style="color: #FFCB00;">✓ Best Performance</span></div>
+                                            <div class="option-detail">1:10 Contention • Standard SLA</div>
+                                        </div>
+                                    </div>
+                                    <div class="compare-link">
+                                        <a href="#">Compare SLAs</a> • <a href="#">Add backup link</a>
+                                    </div>
+                                </div>
+                                <div class="message-time">10:43 AM</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <div class="chat-input-wrapper">
+                        <textarea class="chat-input" rows="1" placeholder="Ask about connectivity..."></textarea>
+                        <button class="send-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            function toggleAssistant() {
+                document.getElementById('right-sidebar').classList.toggle('collapsed');
+            }
+            
+            function createNewBuild() {
+                alert('Create New Build - Coming soon!');
+            }
+            
+            // Coverage option selection
+            document.querySelectorAll('.coverage-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.coverage-option').forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Auto-expand textarea
+            document.querySelector('.chat-input').addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+            });
+            
+            // Mobile sidebar toggles
+            function toggleLeftSidebar() {
+                document.getElementById('left-sidebar').classList.toggle('open');
+            }
+            
+            function toggleRightSidebar() {
+                document.getElementById('right-sidebar').classList.toggle('open');
+            }
+        </script>
+    </body>
+    </html>
+  `)
+})
+
 // Onboarding wizard
 app.get('/onboarding', (c) => {
   return c.html(`
