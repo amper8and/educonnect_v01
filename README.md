@@ -4,7 +4,12 @@ A modern, responsive web portal for MTN South Africa's education connectivity so
 
 ## 🌟 Features
 
-- **Authentication**: OTP-based login via phone or email
+- **Authentication**: OTP-based login via phone or email with smart redirect
+- **User Onboarding**: 4-step KYC wizard with document upload
+- **Solution Builder**: Three-panel configuration tool with AI assistant
+- **Build History**: Manage multiple builds with status tracking
+- **Configuration Wizard**: Multi-step form (Persons → Sites → Assets → Review)
+- **AI Assistant**: Real-time configuration suggestions and recommendations
 - **MTN Branding**: Full MTN brand identity with custom fonts and colors
 - **Responsive Design**: Mobile-first approach with desktop optimization
 - **Modern UI/UX**: Clean, professional interface with smooth animations
@@ -124,6 +129,42 @@ npm test                 # Test local server
 - OTP logged to console (check PM2 logs)
 - Any 6-digit OTP code accepted for verification
 
+### Test Accounts
+- **New User**: Any phone/email → redirects to onboarding
+- **Admin**: +27123456789 or admin@educonnect.mtn.co.za → redirects to dashboard
+- **Account Manager**: +27987654321 or account@school.co.za → redirects to dashboard
+
+## 🔨 Solution Builder
+
+### Features
+- **Three-Panel Layout**: Build history, configuration wizard, AI assistant
+- **Build Management**: Create, save, and load builds with status tracking
+- **Multi-Step Wizard**: 
+  1. **Persons**: Configure users (learners, educators, admins, parents)
+  2. **Sites**: Define campus locations and coverage requirements
+  3. **Assets**: Select hardware and bandwidth requirements
+  4. **Review**: Summary of configuration with coverage verification
+- **AI Assistant**: Real-time chat with configuration recommendations
+- **LocalStorage**: Builds saved locally for demo mode
+- **Mobile Responsive**: Collapsible sidebars for mobile devices
+
+### Build Statuses
+- **Draft**: Work in progress
+- **Saved**: Configuration completed
+- **Offered**: Proposal sent to customer
+- **Active**: Deployed and active
+
+### API Endpoints
+```
+GET    /api/builds           # List all builds
+GET    /api/builds/:id       # Get specific build
+POST   /api/builds           # Create new build
+PUT    /api/builds/:id       # Update existing build
+DELETE /api/builds/:id       # Delete build
+POST   /api/ai/chat          # AI assistant chat
+POST   /api/coverage/check   # Check network coverage
+```
+
 ## 🌐 Deployment
 
 ### Cloudflare Pages
@@ -141,28 +182,41 @@ No environment variables required for demo mode.
 
 ## 📊 Current Status
 
-**Version**: 1.0.0  
-**Status**: ✅ Landing Page Complete  
+**Version**: 1.0.1  
+**Status**: ✅ Solution Builder Complete  
 **Last Updated**: 2026-02-06
 
 ### Completed Features
 - ✅ Landing page with hero section
-- ✅ Phone/email login forms
+- ✅ Phone/email login forms  
 - ✅ OTP modal with 6-digit input
 - ✅ OTP API endpoints (demo mode)
+- ✅ User state tracking (new vs returning)
 - ✅ Success modal with redirect
+- ✅ 4-step KYC onboarding wizard
+- ✅ Document upload (drag & drop)
+- ✅ Dashboard with navigation
+- ✅ **Solution Builder** (Three-panel layout)
+  - ✅ Left panel: Build history with status badges
+  - ✅ Center panel: Configuration wizard (4 steps)
+  - ✅ Right panel: AI assistant chat
+  - ✅ Mobile responsive design
+- ✅ Build management API endpoints
+- ✅ AI assistant API (mock responses)
+- ✅ Coverage check API
 - ✅ MTN brand identity
 - ✅ Responsive design
 - ✅ Custom fonts loaded
 
 ### Upcoming Features
-- ⏳ Dashboard interface
-- ⏳ Solution Builder
-- ⏳ Build management
-- ⏳ Commercials & pricing
-- ⏳ Checkout flow
+- ⏳ Commercials & pricing page
+- ⏳ Checkout flow with payment
+- ⏳ Orders management
 - ⏳ Admin panel
 - ⏳ Analytics dashboard
+- ⏳ Production OTP delivery
+- ⏳ Database integration
+- ⏳ Real AI integration
 
 ## 🤝 Contributing
 
