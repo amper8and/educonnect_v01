@@ -652,9 +652,12 @@ app.get('/dashboard', (c) => {
             <div class="card text-center">
                 <img src="/static/images/logos/mtn-educonnect-logo.png" alt="EduConnect" style="height: 120px; margin: 0 auto 2rem;">
                 <h1 class="mb-4">Welcome to EduConnect!</h1>
-                <p class="text-secondary mb-6">Complete your profile to get started</p>
-                <div style="display: flex; gap: 1rem; justify-content: center;">
-                    <a href="/onboarding" class="btn btn-primary">
+                <p class="text-secondary mb-6">Your education solutions portal</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="/solution-builder" class="btn btn-primary">
+                        <i class="fas fa-rocket mr-2"></i> Solution Builder
+                    </a>
+                    <a href="/onboarding" class="btn btn-outline">
                         <i class="fas fa-user-check mr-2"></i> Complete Profile
                     </a>
                     <a href="/" class="btn btn-secondary">
