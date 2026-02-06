@@ -370,7 +370,7 @@ app.get('/', (c) => {
                     <i class="fas fa-check"></i>
                 </div>
                 <h3 class="mb-2">Authentication Successful!</h3>
-                <p class="text-secondary mb-0">Redirecting to dashboard...</p>
+                <p class="text-secondary mb-0" id="success-message">Redirecting...</p>
             </div>
         </div>
         
@@ -575,8 +575,10 @@ app.get('/', (c) => {
                     const data = await response.json();
                     
                     if (data.success) {
+                        // Store user info for redirect
+                        sessionStorage.setItem('educonnect_user', JSON.stringify(data.user));
                         closeOTPModal();
-                        showSuccessModal();
+                        showSuccessModal(data.user);
                     } else {
                         showOTPError(data.message || 'Invalid OTP code');
                     }
@@ -602,12 +604,22 @@ app.get('/', (c) => {
             }
             
             // Show success modal
-            function showSuccessModal() {
-                document.getElementById('success-modal').style.display = 'flex';
+            function showSuccessModal(user) {
+                const modal = document.getElementById('success-modal');
+                const message = document.getElementById('success-message');
                 
-                // Redirect after 2 seconds
+                // Update success message based on user type
+                if (user.type === 'single') {
+                    message.textContent = 'Welcome! Redirecting to complete your profile...';
+                } else {
+                    message.textContent = 'Welcome back! Redirecting to dashboard...';
+                }
+                
+                modal.style.display = 'flex';
+                
+                // Redirect after 2 seconds to appropriate page
                 setTimeout(() => {
-                    window.location.href = '/dashboard';
+                    window.location.href = user.redirectTo;
                 }, 2000);
             }
             
@@ -1312,18 +1324,68 @@ app.post('/api/auth/verify-otp', async (c) => {
   
   // Demo mode: Accept any 6-digit OTP
   if (otp && otp.length === 6) {
+    // Check if user exists and get their status
+    // In demo mode, we'll use a whitelist to simulate database lookup
+    const knownUsers = {
+      '+27123456789': { 
+        role: 'admin', 
+        onboardingComplete: true, 
+        name: 'Admin User' 
+      },
+      'admin@educonnect.mtn.co.za': { 
+        role: 'admin', 
+        onboardingComplete: true, 
+        name: 'Admin User' 
+      },
+      '+27987654321': { 
+        role: 'account', 
+        onboardingComplete: true, 
+        name: 'Account Manager' 
+      },
+      'account@school.co.za': { 
+        role: 'account', 
+        onboardingComplete: true, 
+        name: 'Account Manager' 
+      }
+    }
+    
+    const user = knownUsers[destination]
+    
+    // Determine user type and onboarding status
+    let userType, onboardingComplete, userName
+    
+    if (user) {
+      // Returning user (known in system)
+      userType = user.role
+      onboardingComplete = user.onboardingComplete
+      userName = user.name
+    } else {
+      // New "Single" user (not in system)
+      userType = 'single'
+      onboardingComplete = false
+      userName = 'New User'
+    }
+    
     console.log('\\n========================================')
     console.log('✅ OTP VERIFIED')
     console.log('========================================')
     console.log('Destination:', destination)
     console.log('OTP:', otp)
-    console.log('Status: Success')
+    console.log('User Type:', userType)
+    console.log('Onboarding Complete:', onboardingComplete)
+    console.log('Redirect To:', onboardingComplete ? 'Dashboard' : 'Onboarding')
     console.log('========================================\\n')
     
     return c.json({
       success: true,
       message: 'OTP verified successfully',
-      role: 'user' // Default role
+      user: {
+        destination,
+        type: userType,
+        name: userName,
+        onboardingComplete: onboardingComplete,
+        redirectTo: onboardingComplete ? '/dashboard' : '/onboarding'
+      }
     })
   } else {
     return c.json({
@@ -1347,15 +1409,17 @@ app.post('/api/onboarding/submit', async (c) => {
   console.log('Institution:', body.institution)
   console.log('Role:', body.role)
   console.log('Staff ID:', body.staffId)
-  console.log('Status: Pending Verification')
+  console.log('Status: Onboarding Complete - Pending Verification')
   console.log('Expected Review Time: 24-48 hours')
+  console.log('User can now access dashboard')
   console.log('========================================\n')
   
   return c.json({
     success: true,
     message: 'Onboarding completed successfully',
     status: 'pending_verification',
-    estimatedReviewTime: '24-48 hours'
+    estimatedReviewTime: '24-48 hours',
+    onboardingComplete: true
   })
 })
 
