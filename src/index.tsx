@@ -412,6 +412,9 @@ app.get('/', (c) => {
                     
                     if (data.success) {
                         otpDestination = fullPhone;
+                        // Show OTP in browser console and alert (demo mode)
+                        console.log('🔐 DEMO MODE - Your OTP:', data.otp);
+                        alert('🔐 DEMO MODE\\n\\nYour OTP Code: ' + data.otp + '\\n\\n(Check browser console for details)');
                         showOTPModal(fullPhone);
                     } else {
                         alert('Error: ' + data.message);
@@ -447,6 +450,9 @@ app.get('/', (c) => {
                     
                     if (data.success) {
                         otpDestination = email;
+                        // Show OTP in browser console and alert (demo mode)
+                        console.log('🔐 DEMO MODE - Your OTP:', data.otp);
+                        alert('🔐 DEMO MODE\\n\\nYour OTP Code: ' + data.otp + '\\n\\n(Check browser console for details)');
                         showOTPModal(email);
                     } else {
                         alert('Error: ' + data.message);
