@@ -1407,51 +1407,21 @@ app.get('/solution-builder', (c) => {
                         New Solution
                     </button>
                 </div>
-                <div class="build-list">
-                    <div class="build-item active">
-                        <div class="build-item-header">
-                            <div style="display: flex; align-items: flex-start; flex: 1;">
-                                <div class="build-icon">
-                                    <i class="fas fa-folder"></i>
-                                </div>
-                                <div class="build-details">
-                                    <div class="build-name">UCT - Fiber Upgr...</div>
-                                    <div class="build-meta">Edited 2 mins ago</div>
-                                    <span class="status-badge status-active">Active</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="build-item">
-                        <div class="build-item-header">
-                            <div style="display: flex; align-items: flex-start; flex: 1;">
-                                <div class="build-icon">
-                                    <i class="fas fa-folder"></i>
-                                </div>
-                                <div class="build-details">
-                                    <div class="build-name">Pretoria High - D...</div>
-                                    <div class="build-meta">Edited 4 hrs ago</div>
-                                    <span class="status-badge status-saved">Saved</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="build-item">
-                        <div class="build-item-header">
-                            <div style="display: flex; align-items: flex-start; flex: 1;">
-                                <div class="build-icon">
-                                    <i class="fas fa-folder"></i>
-                                </div>
-                                <div class="build-details">
-                                    <div class="build-name">Stellies Wifi Upg...</div>
-                                    <div class="build-meta">Oct 24, 2025</div>
-                                    <span class="status-badge status-offered">Offered</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                
+                <!-- Status Filter -->
+                <div style="padding: 0 1rem 1rem;">
+                    <select class="form-input" id="status-filter" onchange="filterBuilds()" style="width: 100%; font-size: 0.875rem;">
+                        <option value="all">All Solutions</option>
+                        <option value="saved">Saved</option>
+                        <option value="active">Active</option>
+                        <option value="offered">Offered</option>
+                        <option value="archived">Archived</option>
+                    </select>
+                </div>
+                
+                <!-- Dynamic Build List -->
+                <div class="build-list" id="build-list">
+                    <!-- Builds will be rendered here dynamically -->
                 </div>
             </div>
             
@@ -1672,11 +1642,187 @@ app.get('/solution-builder', (c) => {
         </div>
         
         <script>
-            function toggleAssistant() {
-                document.getElementById('right-sidebar').classList.toggle('collapsed');
+            // ============================================
+            // STATE MANAGEMENT
+            // ============================================
+            let builds = [];
+            let currentBuildId = null;
+            let statusFilter = 'all';
+            
+            // Initialize on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                loadBuilds();
+                renderBuilds();
+                
+                // Load last active build or create new one
+                if (builds.length > 0) {
+                    const lastBuild = builds[0]; // Most recently accessed is first
+                    loadBuild(lastBuild.id);
+                } else {
+                    createNewBuild();
+                }
+                
+                console.log('🚀 SOLUTION BUILDER INITIALIZED');
+                console.log('Total Builds:', builds.length);
+                
+                // Setup event listeners
+                setupEventListeners();
+            });
+            
+            function setupEventListeners() {
+                // Coverage option selection
+                document.querySelectorAll('.coverage-option').forEach(option => {
+                    option.addEventListener('click', function() {
+                        document.querySelectorAll('.coverage-option').forEach(o => o.classList.remove('selected'));
+                        this.classList.add('selected');
+                    });
+                });
+                
+                // Auto-expand textarea
+                const chatInput = document.querySelector('.chat-input');
+                if (chatInput) {
+                    chatInput.addEventListener('input', function() {
+                        this.style.height = 'auto';
+                        this.style.height = this.scrollHeight + 'px';
+                    });
+                }
+                
+                // Auto-save on input change
+                document.addEventListener('input', function(e) {
+                    if (e.target.matches('.form-input, .form-select, .form-textarea')) {
+                        autoSaveCurrent();
+                    }
+                });
             }
             
+            // Load builds from localStorage
+            function loadBuilds() {
+                const saved = localStorage.getItem('educonnect_builds');
+                if (saved) {
+                    builds = JSON.parse(saved);
+                } else {
+                    // Initialize with empty array - will create first build
+                    builds = [];
+                }
+                
+                // Sort by last accessed (most recent first)
+                builds.sort((a, b) => new Date(b.lastAccessed) - new Date(a.lastAccessed));
+            }
+            
+            // Save builds to localStorage
+            function saveBuilds() {
+                localStorage.setItem('educonnect_builds', JSON.stringify(builds));
+            }
+            
+            // Get relative time string
+            function getRelativeTime(isoString) {
+                const date = new Date(isoString);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMs / 3600000);
+                const diffDays = Math.floor(diffMs / 86400000);
+                
+                if (diffMins < 1) return 'Just now';
+                if (diffMins < 60) return diffMins + ' mins ago';
+                if (diffHours < 24) return diffHours + ' hrs ago';
+                if (diffDays < 30) return diffDays + ' days ago';
+                return date.toLocaleDateString();
+            }
+            
+            // Render build history list
+            function renderBuilds() {
+                const container = document.getElementById('build-list');
+                const filteredBuilds = statusFilter === 'all' 
+                    ? builds 
+                    : builds.filter(b => b.status === statusFilter);
+                
+                if (filteredBuilds.length === 0) {
+                    container.innerHTML = '<div style="padding: 2rem 1rem; text-align: center; color: #6B7280; font-size: 0.875rem;">No solutions found</div>';
+                    return;
+                }
+                
+                container.innerHTML = filteredBuilds.map(build => {
+                    const isActive = build.id === currentBuildId;
+                    const canDelete = build.status === 'saved';
+                    const canArchive = build.status === 'active' || build.status === 'offered';
+                    
+                    let html = '<div class="build-item ' + (isActive ? 'active' : '') + '" onclick="loadBuild(\'' + build.id + '\')" style="position: relative;">';
+                    html += '<div class="build-item-header">';
+                    html += '<div style="display: flex; align-items: flex-start; flex: 1;">';
+                    html += '<div class="build-icon"><i class="fas fa-folder"></i></div>';
+                    html += '<div class="build-details">';
+                    html += '<div class="build-name">' + (build.name || 'Untitled Solution') + '</div>';
+                    html += '<div class="build-meta">' + getRelativeTime(build.lastAccessed) + '</div>';
+                    html += '<span class="status-badge status-' + build.status + '">' + build.status.charAt(0).toUpperCase() + build.status.slice(1) + '</span>';
+                    html += '</div></div></div>';
+                    
+                    if (canDelete) {
+                        html += '<button class="delete-btn" onclick="event.stopPropagation(); deleteBuild(\'' + build.id + '\')" title="Delete" style="position: absolute; top: 0.5rem; right: 0.5rem; background: #EF4444; color: white; border: none; border-radius: 4px; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;"><i class="fas fa-trash"></i></button>';
+                    }
+                    
+                    if (canArchive) {
+                        html += '<button class="archive-btn" onclick="event.stopPropagation(); archiveBuild(\'' + build.id + '\')" title="Archive" style="position: absolute; top: 0.5rem; right: 0.5rem; background: #6B7280; color: white; border: none; border-radius: 4px; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;"><i class="fas fa-archive"></i></button>';
+                    }
+                    
+                    html += '</div>';
+                    return html;
+                }).join('');
+            }
+            
+            // Filter builds by status
+            function filterBuilds() {
+                statusFilter = document.getElementById('status-filter').value;
+                renderBuilds();
+                console.log('🔍 FILTER APPLIED:', statusFilter);
+            }
+            
+            // Get current form data
+            function getCurrentFormData() {
+                return {
+                    siteName: document.querySelector('input[placeholder*="site name"]')?.value || '',
+                    campusType: document.querySelector('select')?.value || '',
+                    students: document.querySelector('input[placeholder*="students"]')?.value || '',
+                    staff: document.querySelector('input[placeholder*="staff"]')?.value || '',
+                    address: document.querySelector('input[placeholder*="address"]')?.value || ''
+                };
+            }
+            
+            // Auto-save current build
+            function autoSaveCurrent() {
+                if (!currentBuildId) return;
+                
+                const build = builds.find(b => b.id === currentBuildId);
+                if (!build) return;
+                
+                build.data = getCurrentFormData();
+                build.name = build.data.siteName || 'New Solution';
+                build.lastAccessed = new Date().toISOString();
+                
+                saveBuilds();
+                
+                console.log('💾 AUTO-SAVED:', build.name);
+            }
+            
+            // Create new build
             function createNewBuild() {
+                // Auto-save current build before creating new one
+                autoSaveCurrent();
+                
+                // Create new build
+                const newBuild = {
+                    id: Date.now().toString(),
+                    name: 'New Solution',
+                    status: 'saved',
+                    target: '',
+                    lastAccessed: new Date().toISOString(),
+                    data: {}
+                };
+                
+                builds.unshift(newBuild); // Add to beginning (most recent)
+                saveBuilds();
+                currentBuildId = newBuild.id;
+                
                 // Clear all form inputs
                 document.querySelectorAll('.form-input, .form-select, .form-textarea').forEach(input => {
                     if (input.type === 'checkbox') {
@@ -1704,12 +1850,11 @@ app.get('/solution-builder', (c) => {
                 document.querySelectorAll('.config-card').forEach(card => {
                     card.style.display = 'none';
                 });
-                document.querySelector('.config-card').style.display = 'block';
+                const firstCard = document.querySelector('.config-card');
+                if (firstCard) firstCard.style.display = 'block';
                 
-                // Remove active state from all build items
-                document.querySelectorAll('.build-item').forEach(item => {
-                    item.classList.remove('active');
-                });
+                // Update UI
+                renderBuilds();
                 
                 // Set focus to first input field
                 const firstInput = document.querySelector('.form-input');
@@ -1717,23 +1862,115 @@ app.get('/solution-builder', (c) => {
                     setTimeout(() => firstInput.focus(), 100);
                 }
                 
-                console.log('✨ NEW SOLUTION STARTED');
-                console.log('Ready to configure a new educational solution');
+                console.log('✨ NEW SOLUTION CREATED');
+                console.log('Build ID:', newBuild.id);
             }
             
-            // Coverage option selection
-            document.querySelectorAll('.coverage-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    document.querySelectorAll('.coverage-option').forEach(o => o.classList.remove('selected'));
-                    this.classList.add('selected');
-                });
-            });
+            // Load existing build
+            function loadBuild(buildId) {
+                // Auto-save current build before switching
+                autoSaveCurrent();
+                
+                const build = builds.find(b => b.id === buildId);
+                if (!build) {
+                    console.error('Build not found:', buildId);
+                    return;
+                }
+                
+                currentBuildId = buildId;
+                build.lastAccessed = new Date().toISOString();
+                
+                // Re-sort builds by last accessed
+                builds.sort((a, b) => new Date(b.lastAccessed) - new Date(a.lastAccessed));
+                saveBuilds();
+                
+                // Load form data
+                if (build.data) {
+                    const siteNameInput = document.querySelector('input[placeholder*="site name"]');
+                    if (siteNameInput) siteNameInput.value = build.data.siteName || '';
+                    
+                    const campusTypeSelect = document.querySelector('select');
+                    if (campusTypeSelect) campusTypeSelect.value = build.data.campusType || '';
+                    
+                    const studentsInput = document.querySelector('input[placeholder*="students"]');
+                    if (studentsInput) studentsInput.value = build.data.students || '';
+                    
+                    const staffInput = document.querySelector('input[placeholder*="staff"]');
+                    if (staffInput) staffInput.value = build.data.staff || '';
+                    
+                    const addressInput = document.querySelector('input[placeholder*="address"]');
+                    if (addressInput) addressInput.value = build.data.address || '';
+                }
+                
+                // Update UI
+                renderBuilds();
+                
+                console.log('📂 BUILD LOADED');
+                console.log('Build:', build.name);
+                console.log('Status:', build.status);
+            }
             
-            // Auto-expand textarea
-            document.querySelector('.chat-input').addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = this.scrollHeight + 'px';
-            });
+            // Delete build (only for 'saved' status)
+            function deleteBuild(buildId) {
+                const build = builds.find(b => b.id === buildId);
+                if (!build) return;
+                
+                if (build.status !== 'saved') {
+                    alert('Only saved solutions can be deleted. Active and Offered solutions must be archived first.');
+                    return;
+                }
+                
+                if (!confirm('Are you sure you want to delete "' + build.name + '"?')) {
+                    return;
+                }
+                
+                builds = builds.filter(b => b.id !== buildId);
+                saveBuilds();
+                
+                // If we deleted the current build, load another one or create new
+                if (currentBuildId === buildId) {
+                    if (builds.length > 0) {
+                        loadBuild(builds[0].id);
+                    } else {
+                        createNewBuild();
+                    }
+                }
+                
+                renderBuilds();
+                
+                console.log('🗑️  BUILD DELETED');
+                console.log('Build:', build.name);
+            }
+            
+            // Archive build (for 'active' or 'offered' status)
+            function archiveBuild(buildId) {
+                const build = builds.find(b => b.id === buildId);
+                if (!build) return;
+                
+                if (build.status !== 'active' && build.status !== 'offered') {
+                    alert('Only active or offered solutions can be archived.');
+                    return;
+                }
+                
+                if (!confirm('Archive "' + build.name + '"? It will be moved to archived status.')) {
+                    return;
+                }
+                
+                build.status = 'archived';
+                build.lastAccessed = new Date().toISOString();
+                saveBuilds();
+                renderBuilds();
+                
+                console.log('📦 BUILD ARCHIVED');
+                console.log('Build:', build.name);
+            }
+            
+            // ============================================
+            // UI FUNCTIONS
+            // ============================================
+            function toggleAssistant() {
+                document.getElementById('right-sidebar').classList.toggle('collapsed');
+            }
             
             // Mobile sidebar toggles
             function toggleLeftSidebar() {
