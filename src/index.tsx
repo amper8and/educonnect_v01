@@ -1097,6 +1097,31 @@ app.get('/solution-builder', (c) => {
                 background: #FEE2E2;
             }
             
+            /* Term selection buttons */
+            .term-btn {
+                padding: 0.75rem 1rem;
+                border: 2px solid #E5E7EB;
+                border-radius: 0.5rem;
+                background: white;
+                color: #6B7280;
+                font-weight: 600;
+                font-size: 0.875rem;
+                cursor: pointer;
+                transition: all 0.2s;
+                text-align: center;
+            }
+            
+            .term-btn:hover {
+                border-color: #FFCB00;
+                background: #FFFBF0;
+            }
+            
+            .term-btn.active {
+                border-color: #FFCB00;
+                background: #FFCB00;
+                color: #000000;
+            }
+            
             /* Modal Styles */
             .modal {
                 display: none;
@@ -2163,16 +2188,87 @@ app.get('/solution-builder', (c) => {
                     </div>
                 </div>
                 
-                <!-- Step 5: Commercials (Placeholder for Delivery 5) -->
+                <!-- Step 5: Review Commercials -->
                 <div class="config-card step-content" id="step-5" style="display: none;">
                     <div class="step-header">
-                        <h2 class="card-title">Commercials Review</h2>
+                        <h2 class="card-title">Review Commercials</h2>
                         <p class="card-subtitle">Review pricing and finalize your solution</p>
                     </div>
-                    <div style="padding: 3rem; text-align: center; color: #6B7280;">
-                        <i class="fas fa-file-invoice-dollar" style="font-size: 3rem; margin-bottom: 1rem; color: #D1D5DB;"></i>
-                        <p style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Step 5: Coming in Delivery 5</p>
-                        <p>Pricing calculations and actions will be implemented last</p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                        <!-- Left: Pricing Summary -->
+                        <div>
+                            <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 1.5rem;">Pricing Summary</h3>
+                            
+                            <div style="margin-bottom: 1.5rem;">
+                                <label class="form-label">Build Name</label>
+                                <div style="font-weight: 600; font-size: 1.125rem;" id="commercials-build-name">-</div>
+                            </div>
+                            
+                            <div style="margin-bottom: 1.5rem;">
+                                <label class="form-label">Solution Type</label>
+                                <div style="color: #6B7280;" id="commercials-solution-type">-</div>
+                            </div>
+                            
+                            <div style="background: #F9FAFB; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                                    <span style="font-weight: 600;">Once-off Setup</span>
+                                    <span style="font-weight: 600; font-size: 1.25rem;" id="commercials-once-off">R 0.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="font-weight: 600;">Monthly Recurring</span>
+                                    <span style="font-weight: 600; font-size: 1.25rem;" id="commercials-monthly">R 0.00</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 1.5rem;">
+                                <label class="form-label">Contract Term</label>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
+                                    <button class="term-btn" data-term="0" onclick="selectTerm(0)">Month-to-month</button>
+                                    <button class="term-btn" data-term="6" onclick="selectTerm(6)">6 months</button>
+                                    <button class="term-btn active" data-term="12" onclick="selectTerm(12)">12 months</button>
+                                    <button class="term-btn" data-term="24" onclick="selectTerm(24)">24 months<div style="font-size: 0.75rem; color: #10B981; font-weight: 600;">-10%</div></button>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Discount Code</label>
+                                <div style="display: flex; gap: 0.75rem;">
+                                    <input type="text" class="form-input" id="discount-code-input" placeholder="Enter code" style="flex: 1;">
+                                    <button class="btn-secondary" onclick="applyDiscountCode()" style="padding: 0.75rem 1.5rem; background: #F3F4F6; color: #000; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">Apply</button>
+                                </div>
+                                <div id="discount-message" style="margin-top: 0.5rem; font-size: 0.875rem;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right: Annual Total & Actions -->
+                        <div>
+                            <div style="background: #FFFBF0; border: 2px solid #FFCB00; border-radius: 0.75rem; padding: 2rem; text-align: center; margin-bottom: 2rem;">
+                                <div style="font-size: 0.875rem; font-weight: 600; color: #6B7280; margin-bottom: 0.5rem;">Annual Total</div>
+                                <div style="font-size: 3rem; font-weight: 700; color: #000000;" id="commercials-annual-total">R 0.00</div>
+                                <div style="font-size: 0.875rem; color: #6B7280; margin-top: 0.5rem;" id="commercials-term-note">12-month contract</div>
+                            </div>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <button onclick="saveBuild()" style="padding: 1rem; background: #F3F4F6; color: #000; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1rem;">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                                <button onclick="generateOffer()" style="padding: 1rem; background: #F3F4F6; color: #000; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1rem;">
+                                    <i class="fas fa-file-invoice"></i> Generate Offer
+                                </button>
+                                <button onclick="activateBuild()" style="padding: 1rem; background: #FFCB00; color: #000; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1rem;">
+                                    <i class="fas fa-check-circle"></i> Activate
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-bar">
+                        <div>
+                            <button class="btn-secondary" onclick="goToStep(4)" style="padding: 0.75rem 1.5rem; background: #F3F4F6; color: #000; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">
+                                <i class="fas fa-arrow-left mr-2"></i> Back
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
@@ -2781,6 +2877,8 @@ app.get('/solution-builder', (c) => {
                     renderTargetDetails();
                 } else if (stepNumber === 4) {
                     renderSolutionSelection();
+                } else if (stepNumber === 5) {
+                    renderCommercials();
                 }
                 
                 // Update stepper UI
@@ -2972,6 +3070,49 @@ app.get('/solution-builder', (c) => {
                         'PowerFleet - Vision AI': ['AI Video', 'AI Dash Cam'],
                         'PowerFleet - MiX': ['Vehicle Telematics'],
                         'PowerFleet - MyPanic': ['Panic / Emergency App']
+                    }
+                }
+            };
+            
+            // PRICING DATA (ZAR prices, recurring monthly unless noted)
+            const pricingData = {
+                'EduStudent': {
+                    'Education Prepaid': {
+                        'Small - 5GB + 50mins': { onceOff: 0, recurring: 49 },
+                        'Medium - 10GB + 100mins': { onceOff: 0, recurring: 99 },
+                        'Large - 25GB + 200mins': { onceOff: 0, recurring: 199 }
+                    },
+                    'AI-Mobile': {
+                        '4EC + AI Tutor': { onceOff: 0, recurring: 25 }
+                    }
+                },
+                'EduFlex': {
+                    'Uncapped Wireless': {
+                        'FWA Lite - 10Mbps': { onceOff: 0, recurring: 300 },
+                        'FWA Standard - 50Mbps': { onceOff: 0, recurring: 424 },
+                        'FWA Extra - 100Mbps': { onceOff: 0, recurring: 525 }
+                    }
+                },
+                'EduSchool': {
+                    'Education Fibre': {
+                        'Fibre Lite - 50Mbps': { onceOff: 0, recurring: 349.50 },
+                        'Fibree Standard - 200Mbps': { onceOff: 0, recurring: 549.50 },
+                        'Fibre Extra - 500Mbps': { onceOff: 0, recurring: 749.50 }
+                    },
+                    'Campus WiFi': {
+                        'APN + Eagle Eye + Security': { onceOff: 5000, recurring: 450 }
+                    }
+                },
+                'EduSafe': {
+                    'PowerFleet - Vision AI': {
+                        'AI Video': { onceOff: 2500, recurring: 200 },
+                        'AI Dash Cam': { onceOff: 2000, recurring: 180 }
+                    },
+                    'PowerFleet - MiX': {
+                        'Vehicle Telematics': { onceOff: 2000, recurring: 150 }
+                    },
+                    'PowerFleet - MyPanic': {
+                        'Panic / Emergency App': { onceOff: 0, recurring: 55 }
                     }
                 }
             };
@@ -3382,6 +3523,163 @@ app.get('/solution-builder', (c) => {
                 // Rule 4: EduSafe has no mandatory rules (optional)
                 
                 return { valid: true, message: '' };
+            }
+            
+            // ============================================
+            // STEP 5: COMMERCIALS FUNCTIONS
+            // ============================================
+            let selectedTerm = 12; // default 12 months
+            let appliedDiscount = 0;
+            let discountCode = '';
+            
+            // Calculate pricing from all targets' solutions
+            function calculatePricing() {
+                let onceOff = 0;
+                let recurring = 0;
+                
+                currentTargets.forEach(target => {
+                    if (target.solutions) {
+                        target.solutions.forEach(sol => {
+                            if (sol.solution && sol.product && sol.package) {
+                                const pricing = pricingData[sol.solution]?.[sol.product]?.[sol.package];
+                                if (pricing) {
+                                    const qty = parseInt(sol.quantity) || 1;
+                                    onceOff += pricing.onceOff * qty;
+                                    recurring += pricing.recurring * qty;
+                                }
+                            }
+                        });
+                    }
+                });
+                
+                return { onceOff, recurring };
+            }
+            
+            // Render commercials step
+            function renderCommercials() {
+                const buildName = document.getElementById('build-name')?.value || 'Untitled Build';
+                const { onceOff, recurring } = calculatePricing();
+                
+                // Count solution types for summary
+                const solutionTypes = new Set();
+                currentTargets.forEach(target => {
+                    if (target.solutions) {
+                        target.solutions.forEach(sol => {
+                            if (sol.solution) solutionTypes.add(sol.solution);
+                        });
+                    }
+                });
+                const solutionSummary = Array.from(solutionTypes).join(', ') || 'No solutions selected';
+                
+                // Apply 24-month discount
+                let finalRecurring = recurring;
+                if (selectedTerm === 24) {
+                    finalRecurring = recurring * 0.9; // 10% discount
+                }
+                
+                // Apply discount code
+                if (appliedDiscount > 0) {
+                    finalRecurring = finalRecurring * (1 - appliedDiscount);
+                }
+                
+                // Calculate total based on term
+                let totalAmount;
+                if (selectedTerm === 0) {
+                    // Month-to-month: show annual equivalent
+                    totalAmount = onceOff + (finalRecurring * 12);
+                } else {
+                    const months = selectedTerm;
+                    totalAmount = onceOff + (finalRecurring * months);
+                }
+                
+                // Update UI
+                document.getElementById('commercials-build-name').textContent = buildName;
+                document.getElementById('commercials-solution-type').textContent = solutionSummary;
+                document.getElementById('commercials-once-off').textContent = 'R ' + onceOff.toFixed(2);
+                document.getElementById('commercials-monthly').textContent = 'R ' + finalRecurring.toFixed(2);
+                document.getElementById('commercials-annual-total').textContent = 'R ' + totalAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+                
+                let termNote = selectedTerm === 0 ? 'Month-to-month (Annual estimate)' : selectedTerm + '-month contract total';
+                if (selectedTerm === 24) {
+                    termNote += ' (10% discount applied)';
+                }
+                document.getElementById('commercials-term-note').textContent = termNote;
+                
+                console.log('💰 COMMERCIALS RENDERED:', { onceOff, recurring: finalRecurring, total: totalAmount, term: selectedTerm });
+            }
+            
+            // Select contract term
+            function selectTerm(months) {
+                selectedTerm = months;
+                document.querySelectorAll('.term-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (parseInt(btn.getAttribute('data-term')) === months) {
+                        btn.classList.add('active');
+                    }
+                });
+                renderCommercials();
+                console.log('📅 TERM SELECTED:', months, 'months');
+            }
+            
+            // Apply discount code
+            function applyDiscountCode() {
+                const code = document.getElementById('discount-code-input').value.trim().toUpperCase();
+                const msgEl = document.getElementById('discount-message');
+                
+                if (!code) {
+                    msgEl.innerHTML = '<span style="color: #EF4444;"><i class="fas fa-times-circle"></i> Please enter a discount code</span>';
+                    return;
+                }
+                
+                // Demo discount codes
+                const validCodes = {
+                    'EDUDEMO': 0.15,  // 15%
+                    'LAUNCH10': 0.10, // 10%
+                    'PROMO5': 0.05    // 5%
+                };
+                
+                if (validCodes[code]) {
+                    appliedDiscount = validCodes[code];
+                    discountCode = code;
+                    msgEl.innerHTML = '<span style="color: #10B981;"><i class="fas fa-check-circle"></i> ' + code + ' applied (' + (appliedDiscount * 100) + '% discount)</span>';
+                    renderCommercials();
+                    console.log('🎟️ DISCOUNT APPLIED:', code, appliedDiscount);
+                } else {
+                    msgEl.innerHTML = '<span style="color: #EF4444;"><i class="fas fa-times-circle"></i> Invalid discount code</span>';
+                }
+            }
+            
+            // Save build
+            function saveBuild() {
+                autoSaveCurrent();
+                alert('✅ Build saved successfully!\n\nYour solution has been saved and can be accessed from the Recent History.');
+            }
+            
+            // Generate offer
+            function generateOffer() {
+                const buildName = document.getElementById('build-name')?.value || 'Untitled Build';
+                const { onceOff, recurring } = calculatePricing();
+                
+                alert('📄 Generate Offer\\n\\nBuild: ' + buildName + '\\nOnce-off: R ' + onceOff.toFixed(2) + '\\nMonthly: R ' + recurring.toFixed(2) + '\\n\\nThis feature will create a professional PDF offer document for Account and Admin users.\\n\\n(Feature in development)');
+                console.log('📄 OFFER GENERATION REQUESTED');
+            }
+            
+            // Activate build
+            function activateBuild() {
+                const buildName = document.getElementById('build-name')?.value || 'Untitled Build';
+                const { onceOff, recurring } = calculatePricing();
+                let totalAmount;
+                
+                if (selectedTerm === 0) {
+                    totalAmount = onceOff + (recurring * 12);
+                } else {
+                    totalAmount = onceOff + (recurring * selectedTerm);
+                }
+                
+                if (confirm('🚀 Activate Build?\\n\\nBuild: ' + buildName + '\\nTotal: R ' + totalAmount.toFixed(2) + '\\n\\nThis will proceed to checkout and payment.')) {
+                    alert('✅ Build activated!\\n\\nProceeding to checkout and payment flow.\\n\\n(Feature in development)');
+                    console.log('🚀 BUILD ACTIVATED');
+                }
             }
         </script>
     </body>
