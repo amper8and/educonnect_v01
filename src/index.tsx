@@ -3652,7 +3652,7 @@ app.get('/solution-builder', (c) => {
             // Save build
             function saveBuild() {
                 autoSaveCurrent();
-                alert('✅ Build saved successfully!\n\nYour solution has been saved and can be accessed from the Recent History.');
+                alert('✅ Build saved successfully!\\n\\nYour solution has been saved and can be accessed from the Recent History.');
             }
             
             // Generate offer
@@ -3660,7 +3660,7 @@ app.get('/solution-builder', (c) => {
                 const buildName = document.getElementById('build-name')?.value || 'Untitled Build';
                 const { onceOff, recurring } = calculatePricing();
                 
-                alert('📄 Generate Offer\\n\\nBuild: ' + buildName + '\\nOnce-off: R ' + onceOff.toFixed(2) + '\\nMonthly: R ' + recurring.toFixed(2) + '\\n\\nThis feature will create a professional PDF offer document for Account and Admin users.\\n\\n(Feature in development)');
+                alert('📄 Generate Offer\\\\n\\\\nBuild: ' + buildName + '\\\\nOnce-off: R ' + onceOff.toFixed(2) + '\\\\nMonthly: R ' + recurring.toFixed(2) + '\\\\n\\\\nThis feature will create a professional PDF offer document for Account and Admin users.\\\\n\\\\n(Feature in development)');
                 console.log('📄 OFFER GENERATION REQUESTED');
             }
             
@@ -3676,8 +3676,8 @@ app.get('/solution-builder', (c) => {
                     totalAmount = onceOff + (recurring * selectedTerm);
                 }
                 
-                if (confirm('🚀 Activate Build?\\n\\nBuild: ' + buildName + '\\nTotal: R ' + totalAmount.toFixed(2) + '\\n\\nThis will proceed to checkout and payment.')) {
-                    alert('✅ Build activated!\\n\\nProceeding to checkout and payment flow.\\n\\n(Feature in development)');
+                if (confirm('🚀 Activate Build?\\\\n\\\\nBuild: ' + buildName + '\\\\nTotal: R ' + totalAmount.toFixed(2) + '\\\\n\\\\nThis will proceed to checkout and payment.')) {
+                    alert('✅ Build activated!\\\\n\\\\nProceeding to checkout and payment flow.\\\\n\\\\n(Feature in development)');
                     console.log('🚀 BUILD ACTIVATED');
                 }
             }
