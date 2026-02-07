@@ -919,77 +919,306 @@ app.get('/solution-builder', (c) => {
                 padding: 2rem;
             }
             
-            .progress-stepper {
+            /* Progress Stepper */
+            .stepper {
                 display: flex;
-                gap: 1rem;
-                margin-bottom: 2rem;
+                justify-content: space-between;
                 background: white;
-                padding: 1.5rem;
+                padding: 2rem;
                 border-radius: 0.75rem;
                 box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            }
-            
-            .step-item {
-                flex: 1;
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
+                margin-bottom: 2rem;
                 position: relative;
             }
             
-            .step-item:not(:last-child)::after {
+            .stepper::before {
                 content: '';
                 position: absolute;
-                right: -0.5rem;
-                width: 100%;
+                top: 50%;
+                left: 5%;
+                right: 5%;
                 height: 2px;
                 background: #E5E7EB;
-                top: 20px;
                 z-index: 0;
             }
             
-            .step-item.completed::after {
-                background: #FFCB00;
+            .stepper-step {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                position: relative;
+                z-index: 1;
+                cursor: pointer;
+                transition: all 0.3s;
             }
             
-            .step-number {
-                width: 40px;
-                height: 40px;
+            .stepper-number {
+                width: 48px;
+                height: 48px;
                 border-radius: 50%;
                 background: #F3F4F6;
+                color: #9CA3AF;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 font-weight: 700;
+                font-size: 1.125rem;
+                margin-bottom: 0.75rem;
+                transition: all 0.3s;
+                border: 3px solid white;
+                box-shadow: 0 0 0 2px #E5E7EB;
+            }
+            
+            .stepper-step.active .stepper-number {
+                background: #FFCB00;
+                color: #000;
+                box-shadow: 0 0 0 3px #FFCB00;
+                transform: scale(1.1);
+            }
+            
+            .stepper-step.completed .stepper-number {
+                background: #10B981;
+                color: white;
+                box-shadow: 0 0 0 2px #10B981;
+            }
+            
+            .stepper-label {
+                font-size: 0.875rem;
+                font-weight: 600;
                 color: #9CA3AF;
-                z-index: 1;
+                text-align: center;
+                transition: all 0.3s;
+            }
+            
+            .stepper-step.active .stepper-label {
+                color: #000;
+                font-weight: 700;
+            }
+            
+            .stepper-step.completed .stepper-label {
+                color: #10B981;
+            }
+            
+            /* Step Content */
+            .step-content {
+                display: none;
+            }
+            
+            .step-header {
+                margin-bottom: 2rem;
+            }
+            
+            /* Target Cards */
+            .targets-container {
+                margin-bottom: 2rem;
+            }
+            
+            .target-card {
+                background: #F9FAFB;
+                border: 2px solid #E5E7EB;
+                border-radius: 0.75rem;
+                padding: 1.5rem;
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                transition: all 0.2s;
+            }
+            
+            .target-card:hover {
+                border-color: #FFCB00;
+                background: #FFFBF0;
+            }
+            
+            .target-icon {
+                width: 48px;
+                height: 48px;
+                border-radius: 0.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.25rem;
                 flex-shrink: 0;
             }
             
-            .step-item.active .step-number {
-                background: #FFCB00;
-                color: #000;
-            }
-            
-            .step-item.completed .step-number {
-                background: #10B981;
-                color: white;
-            }
-            
-            .step-info {
+            .target-info {
                 flex: 1;
             }
             
-            .step-name {
+            .target-type {
+                font-size: 0.75rem;
+                color: #6B7280;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                margin-bottom: 0.25rem;
+            }
+            
+            .target-name {
                 font-weight: 600;
+                font-size: 1rem;
+                margin-bottom: 0.25rem;
+            }
+            
+            .target-details {
                 font-size: 0.875rem;
                 color: #6B7280;
             }
             
-            .step-item.active .step-name {
+            .target-actions {
+                display: flex;
+                gap: 0.5rem;
+            }
+            
+            .icon-btn {
+                width: 36px;
+                height: 36px;
+                border-radius: 0.5rem;
+                border: none;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s;
+                background: white;
+                color: #6B7280;
+            }
+            
+            .icon-btn:hover {
+                background: #F3F4F6;
                 color: #000;
             }
             
+            .icon-btn.delete {
+                color: #EF4444;
+            }
+            
+            .icon-btn.delete:hover {
+                background: #FEE2E2;
+            }
+            
+            /* Modal Styles */
+            .modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .modal.active {
+                display: flex;
+            }
+            
+            .modal-content {
+                background: white;
+                border-radius: 0.75rem;
+                max-width: 500px;
+                width: 90%;
+                max-height: 90vh;
+                overflow: auto;
+            }
+            
+            .modal-header {
+                padding: 1.5rem;
+                border-bottom: 1px solid #E5E7EB;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            
+            .modal-header h3 {
+                font-size: 1.25rem;
+                font-weight: 700;
+                margin: 0;
+            }
+            
+            .modal-close {
+                width: 32px;
+                height: 32px;
+                border-radius: 0.5rem;
+                border: none;
+                background: #F3F4F6;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s;
+            }
+            
+            .modal-close:hover {
+                background: #E5E7EB;
+            }
+            
+            .modal-body {
+                padding: 1.5rem;
+            }
+            
+            /* Target Type Grid */
+            .target-type-grid {
+                display: grid;
+                gap: 1rem;
+            }
+            
+            .target-type-card {
+                padding: 1.5rem;
+                border: 2px solid #E5E7EB;
+                border-radius: 0.75rem;
+                cursor: pointer;
+                transition: all 0.2s;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+            
+            .target-type-card:hover {
+                border-color: #FFCB00;
+                background: #FFFBF0;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }
+            
+            .target-type-icon {
+                width: 56px;
+                height: 56px;
+                border-radius: 0.75rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                flex-shrink: 0;
+            }
+            
+            .target-type-name {
+                font-weight: 700;
+                font-size: 1.125rem;
+                margin-bottom: 0.25rem;
+            }
+            
+            .target-type-desc {
+                font-size: 0.875rem;
+                color: #6B7280;
+            }
+            
+            /* Form Hint */
+            .form-hint {
+                font-size: 0.875rem;
+                color: #6B7280;
+                margin-top: 0.5rem;
+            }
+            
+            .config-card {
+                background: white;
+                border-radius: 0.75rem;
+                padding: 2rem;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                margin-bottom: 2rem;
+            }
             .config-card {
                 background: white;
                 border-radius: 0.75rem;
@@ -1428,136 +1657,169 @@ app.get('/solution-builder', (c) => {
             <!-- Main Content -->
             <div class="main-content">
                 <!-- Progress Stepper -->
-                <div class="progress-stepper">
-                    <div class="step-item completed">
-                        <div class="step-number">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div class="step-info">
-                            <div class="step-name">Persons</div>
-                        </div>
+                <div class="stepper" id="progress-stepper">
+                    <div class="stepper-step active" data-step="1">
+                        <div class="stepper-number">1</div>
+                        <div class="stepper-label">Solution Name</div>
                     </div>
-                    <div class="step-item active">
-                        <div class="step-number">2</div>
-                        <div class="step-info">
-                            <div class="step-name">Sites</div>
-                        </div>
+                    <div class="stepper-step" data-step="2">
+                        <div class="stepper-number">2</div>
+                        <div class="stepper-label">Target Definition</div>
                     </div>
-                    <div class="step-item">
-                        <div class="step-number">3</div>
-                        <div class="step-info">
-                            <div class="step-name">Assets</div>
-                        </div>
+                    <div class="stepper-step" data-step="3">
+                        <div class="stepper-number">3</div>
+                        <div class="stepper-label">Target Details</div>
                     </div>
-                    <div class="step-item">
-                        <div class="step-number">4</div>
-                        <div class="step-info">
-                            <div class="step-name">Review</div>
+                    <div class="stepper-step" data-step="4">
+                        <div class="stepper-number">4</div>
+                        <div class="stepper-label">Solution Selection</div>
+                    </div>
+                    <div class="stepper-step" data-step="5">
+                        <div class="stepper-number">5</div>
+                        <div class="stepper-label">Commercials</div>
+                    </div>
+                </div>
+                
+                <!-- Step 1: Solution Name -->
+                <div class="config-card step-content" id="step-1" style="display: block;">
+                    <div class="step-header">
+                        <h2 class="card-title">Name Your Solution</h2>
+                        <p class="card-subtitle">Give your educational connectivity solution a meaningful name</p>
+                    </div>
+                    
+                    <form class="step-form">
+                        <div class="form-group" style="margin-bottom: 2rem;">
+                            <label class="form-label">Solution Name <span style="color: #EF4444;">*</span></label>
+                            <input 
+                                type="text" 
+                                id="solution-name-input" 
+                                class="form-input" 
+                                placeholder="e.g., University WiFi Upgrade 2024, K-12 Connectivity Project" 
+                                required
+                            >
+                            <p class="form-hint">This name will be used throughout the solution builder and in reports</p>
+                        </div>
+                        
+                        <div class="action-bar">
+                            <button type="button" class="btn btn-outline" onclick="saveDraft()">
+                                <i class="fas fa-save mr-2"></i> Save Draft
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="goToStep(2)">
+                                Next: Define Targets <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Step 2: Target Definition -->
+                <div class="config-card step-content" id="step-2" style="display: none;">
+                    <div class="step-header">
+                        <h2 class="card-title">Define Targets</h2>
+                        <p class="card-subtitle">Select who or what will receive connectivity solutions</p>
+                    </div>
+                    
+                    <div class="targets-container">
+                        <div class="empty-state" id="empty-targets" style="text-align: center; padding: 3rem; color: #6B7280;">
+                            <i class="fas fa-bullseye" style="font-size: 3rem; margin-bottom: 1rem; color: #D1D5DB;"></i>
+                            <p style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">No targets defined yet</p>
+                            <p>Click "Add Target" below to get started</p>
+                        </div>
+                        
+                        <div id="targets-list"></div>
+                    </div>
+                    
+                    <div class="action-bar">
+                        <button type="button" class="btn btn-secondary" onclick="goToStep(1)">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <div style="display: flex; gap: 1rem;">
+                            <button type="button" class="btn btn-outline" onclick="addTarget()">
+                                <i class="fas fa-plus mr-2"></i> Add Target
+                            </button>
+                            <button type="button" class="btn btn-outline" onclick="saveDraft()">
+                                <i class="fas fa-save mr-2"></i> Save Draft
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="goToStep(3)">
+                                Next: Target Details <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Configuration Card -->
-                <div class="config-card">
-                    <h2 class="card-title">Configure Site Requirements</h2>
-                    <p class="card-subtitle">Enter the connectivity parameters for the primary educational campus.</p>
-                    
-                    <!-- Campus Details -->
-                    <div class="section-header">
-                        <div class="section-icon">
-                            <i class="fas fa-building"></i>
-                        </div>
-                        <div class="section-title">Campus Details</div>
+                <!-- Step 3: Target Details (Placeholder for Delivery 4) -->
+                <div class="config-card step-content" id="step-3" style="display: none;">
+                    <div class="step-header">
+                        <h2 class="card-title">Target Details</h2>
+                        <p class="card-subtitle">Provide specific details for each target</p>
                     </div>
-                    
-                    <form>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Site Name</label>
-                                <input type="text" class="form-input" value="UCT Main Campus" placeholder="Enter site name">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Campus Type</label>
-                                <select class="form-input">
-                                    <option>University / Higher Ed</option>
-                                    <option>High School</option>
-                                    <option>Primary School</option>
-                                    <option>Technical College</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Total Students</label>
-                                <input type="number" class="form-input" value="2500" placeholder="Number of students">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Staff Count</label>
-                                <input type="number" class="form-input" value="450" placeholder="Number of staff">
-                            </div>
-                        </div>
-                        
-                        <!-- Location & Coverage -->
-                        <div class="section-header">
-                            <div class="section-icon">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </div>
-                            <div class="section-title">Location & Coverage</div>
-                            <a href="#" style="margin-left: auto; color: #FFCB00; font-size: 0.875rem; text-decoration: none;">Edit coordinates</a>
-                        </div>
-                        
-                        <div class="location-section">
-                            <div>
-                                <div class="form-group">
-                                    <label class="form-label">Address</label>
-                                    <input type="text" class="form-input" value="Rondebosch, Cape Town, 7700" placeholder="Enter address">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label class="form-label">Coverage Requirement</label>
-                                    <div class="coverage-options">
-                                        <div class="coverage-option">
-                                            <div class="coverage-radio"></div>
-                                            <div>
-                                                <div style="font-weight: 600; font-size: 0.875rem;">Indoor Only</div>
-                                            </div>
-                                        </div>
-                                        <div class="coverage-option selected">
-                                            <div class="coverage-radio"></div>
-                                            <div>
-                                                <div style="font-weight: 600; font-size: 0.875rem;">Indoor & Outdoor</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 0.75rem; border-radius: 0.5rem; margin-top: 1rem;">
-                                    <div style="display: flex; align-items: center; gap: 0.5rem; color: #1E40AF; font-size: 0.875rem;">
-                                        <i class="fas fa-info-circle"></i>
-                                        <span><strong>Based on this location, fiber</strong></span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="map-preview">
-                                <i class="fas fa-map text-4xl"></i>
-                            </div>
-                        </div>
-                        
-                        <!-- Action Buttons -->
-                        <div class="action-bar">
-                            <button type="button" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left mr-2"></i> Back
+                    <div style="padding: 3rem; text-align: center; color: #6B7280;">
+                        <i class="fas fa-wrench" style="font-size: 3rem; margin-bottom: 1rem; color: #D1D5DB;"></i>
+                        <p style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Step 3: Coming in Delivery 4</p>
+                        <p>Target-specific detail forms will be implemented next</p>
+                    </div>
+                </div>
+                
+                <!-- Step 4: Solution Selection (Placeholder for Delivery 4) -->
+                <div class="config-card step-content" id="step-4" style="display: none;">
+                    <div class="step-header">
+                        <h2 class="card-title">Solution Selection</h2>
+                        <p class="card-subtitle">Choose solutions for each target</p>
+                    </div>
+                    <div style="padding: 3rem; text-align: center; color: #6B7280;">
+                        <i class="fas fa-puzzle-piece" style="font-size: 3rem; margin-bottom: 1rem; color: #D1D5DB;"></i>
+                        <p style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Step 4: Coming in Delivery 4</p>
+                        <p>Solution selection with hierarchy will be implemented next</p>
+                    </div>
+                </div>
+                
+                <!-- Step 5: Commercials (Placeholder for Delivery 5) -->
+                <div class="config-card step-content" id="step-5" style="display: none;">
+                    <div class="step-header">
+                        <h2 class="card-title">Commercials Review</h2>
+                        <p class="card-subtitle">Review pricing and finalize your solution</p>
+                    </div>
+                    <div style="padding: 3rem; text-align: center; color: #6B7280;">
+                        <i class="fas fa-file-invoice-dollar" style="font-size: 3rem; margin-bottom: 1rem; color: #D1D5DB;"></i>
+                        <p style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Step 5: Coming in Delivery 5</p>
+                        <p>Pricing calculations and actions will be implemented last</p>
+                    </div>
+                </div>
+                
+                <!-- Target Type Modal -->
+                <div class="modal" id="target-type-modal">
+                    <div class="modal-content" style="max-width: 600px;">
+                        <div class="modal-header">
+                            <h3>Select Target Type</h3>
+                            <button class="modal-close" onclick="closeTargetModal()">
+                                <i class="fas fa-times"></i>
                             </button>
-                            <div style="display: flex; gap: 1rem;">
-                                <button type="button" class="btn btn-outline">Save Draft</button>
-                                <button type="submit" class="btn btn-primary">
-                                    Next Step <i class="fas fa-arrow-right ml-2"></i>
-                                </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="target-type-grid">
+                                <div class="target-type-card" onclick="selectTargetType('Person')">
+                                    <div class="target-type-icon" style="background: #DBEAFE; color: #1E40AF;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="target-type-name">Person</div>
+                                    <div class="target-type-desc">Individual users (students, teachers, staff)</div>
+                                </div>
+                                <div class="target-type-card" onclick="selectTargetType('Site')">
+                                    <div class="target-type-icon" style="background: #FEF3C7; color: #92400E;">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    <div class="target-type-name">Site</div>
+                                    <div class="target-type-desc">Locations (campuses, schools, facilities)</div>
+                                </div>
+                                <div class="target-type-card" onclick="selectTargetType('Asset')">
+                                    <div class="target-type-icon" style="background: #D1FAE5; color: #065F46;">
+                                        <i class="fas fa-box"></i>
+                                    </div>
+                                    <div class="target-type-name">Asset</div>
+                                    <div class="target-type-desc">Devices (tablets, laptops, routers)</div>
+                                </div>
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
             
@@ -1779,12 +2041,10 @@ app.get('/solution-builder', (c) => {
             
             // Get current form data
             function getCurrentFormData() {
+                const solutionNameInput = document.getElementById('solution-name-input');
                 return {
-                    siteName: document.querySelector('input[placeholder*="site name"]')?.value || '',
-                    campusType: document.querySelector('select')?.value || '',
-                    students: document.querySelector('input[placeholder*="students"]')?.value || '',
-                    staff: document.querySelector('input[placeholder*="staff"]')?.value || '',
-                    address: document.querySelector('input[placeholder*="address"]')?.value || ''
+                    solutionName: solutionNameInput?.value || '',
+                    targets: currentTargets
                 };
             }
             
@@ -1796,10 +2056,13 @@ app.get('/solution-builder', (c) => {
                 if (!build) return;
                 
                 build.data = getCurrentFormData();
-                build.name = build.data.siteName || 'New Solution';
+                build.name = build.data.solutionName || 'New Solution';
                 build.lastAccessed = new Date().toISOString();
                 
+                // Re-sort and save
+                builds.sort((a, b) => new Date(b.lastAccessed) - new Date(a.lastAccessed));
                 saveBuilds();
+                renderBuilds();
                 
                 console.log('💾 AUTO-SAVED:', build.name);
             }
@@ -1809,57 +2072,42 @@ app.get('/solution-builder', (c) => {
                 // Auto-save current build before creating new one
                 autoSaveCurrent();
                 
-                // Create new build
+                // Create new build with new data structure
                 const newBuild = {
                     id: Date.now().toString(),
                     name: 'New Solution',
                     status: 'saved',
-                    target: '',
                     lastAccessed: new Date().toISOString(),
-                    data: {}
+                    data: {
+                        solutionName: '',
+                        targets: []
+                    }
                 };
                 
                 builds.unshift(newBuild); // Add to beginning (most recent)
                 saveBuilds();
                 currentBuildId = newBuild.id;
                 
-                // Clear all form inputs
-                document.querySelectorAll('.form-input, .form-select, .form-textarea').forEach(input => {
-                    if (input.type === 'checkbox') {
-                        input.checked = false;
-                    } else if (input.type === 'radio') {
-                        input.checked = false;
-                    } else {
-                        input.value = '';
-                    }
-                });
+                // Reset workflow state
+                currentStep = 1;
+                currentTargets = [];
                 
-                // Reset radio buttons to default (first option)
-                const firstRadio = document.querySelector('input[type="radio"]');
-                if (firstRadio) firstRadio.checked = true;
+                // Clear solution name input
+                const solutionNameInput = document.getElementById('solution-name-input');
+                if (solutionNameInput) {
+                    solutionNameInput.value = '';
+                }
                 
-                // Reset all steps to inactive
-                document.querySelectorAll('.step-item').forEach(step => {
-                    step.classList.remove('active', 'completed');
-                });
-                
-                // Activate first step
-                document.querySelector('.step-item').classList.add('active');
-                
-                // Show first step content
-                document.querySelectorAll('.config-card').forEach(card => {
-                    card.style.display = 'none';
-                });
-                const firstCard = document.querySelector('.config-card');
-                if (firstCard) firstCard.style.display = 'block';
+                // Navigate to step 1
+                goToStep(1);
                 
                 // Update UI
                 renderBuilds();
+                renderTargets();
                 
-                // Set focus to first input field
-                const firstInput = document.querySelector('.form-input');
-                if (firstInput) {
-                    setTimeout(() => firstInput.focus(), 100);
+                // Set focus to solution name input
+                if (solutionNameInput) {
+                    setTimeout(() => solutionNameInput.focus(), 100);
                 }
                 
                 console.log('✨ NEW SOLUTION CREATED');
@@ -1884,30 +2132,29 @@ app.get('/solution-builder', (c) => {
                 builds.sort((a, b) => new Date(b.lastAccessed) - new Date(a.lastAccessed));
                 saveBuilds();
                 
-                // Load form data
+                // Load data into workflow
                 if (build.data) {
-                    const siteNameInput = document.querySelector('input[placeholder*="site name"]');
-                    if (siteNameInput) siteNameInput.value = build.data.siteName || '';
+                    // Load solution name
+                    const solutionNameInput = document.getElementById('solution-name-input');
+                    if (solutionNameInput) {
+                        solutionNameInput.value = build.data.solutionName || '';
+                    }
                     
-                    const campusTypeSelect = document.querySelector('select');
-                    if (campusTypeSelect) campusTypeSelect.value = build.data.campusType || '';
-                    
-                    const studentsInput = document.querySelector('input[placeholder*="students"]');
-                    if (studentsInput) studentsInput.value = build.data.students || '';
-                    
-                    const staffInput = document.querySelector('input[placeholder*="staff"]');
-                    if (staffInput) staffInput.value = build.data.staff || '';
-                    
-                    const addressInput = document.querySelector('input[placeholder*="address"]');
-                    if (addressInput) addressInput.value = build.data.address || '';
+                    // Load targets
+                    currentTargets = build.data.targets || [];
+                    renderTargets();
                 }
+                
+                // Reset to step 1
+                currentStep = 1;
+                goToStep(1);
                 
                 // Update UI
                 renderBuilds();
                 
-                console.log('📂 BUILD LOADED');
-                console.log('Build:', build.name);
-                console.log('Status:', build.status);
+                console.log('📂 LOADED BUILD:', build.name);
+                console.log('Solution Name:', build.data?.solutionName || 'N/A');
+                console.log('Targets:', currentTargets.length);
             }
             
             // Delete build (only for 'saved' status)
@@ -1979,6 +2226,196 @@ app.get('/solution-builder', (c) => {
             
             function toggleRightSidebar() {
                 document.getElementById('right-sidebar').classList.toggle('open');
+            }
+            
+            // ============================================
+            // MULTI-STEP WORKFLOW FUNCTIONS (Delivery 3)
+            // ============================================
+            let currentStep = 1;
+            let currentTargets = [];
+            
+            // Navigate to a specific step
+            function goToStep(stepNumber) {
+                // Validate before moving forward
+                if (stepNumber > currentStep) {
+                    if (stepNumber === 2 && !validateStep1()) {
+                        return;
+                    }
+                    if (stepNumber === 3 && currentTargets.length === 0) {
+                        alert('Please add at least one target before proceeding.');
+                        return;
+                    }
+                }
+                
+                // Hide all steps
+                document.querySelectorAll('.step-content').forEach(step => {
+                    step.style.display = 'none';
+                });
+                
+                // Show target step
+                const targetStepEl = document.getElementById('step-' + stepNumber);
+                if (targetStepEl) {
+                    targetStepEl.style.display = 'block';
+                }
+                
+                // Update stepper UI
+                document.querySelectorAll('.stepper-step').forEach((step, index) => {
+                    const stepNum = index + 1;
+                    step.classList.remove('active', 'completed');
+                    
+                    if (stepNum < stepNumber) {
+                        step.classList.add('completed');
+                        const numberEl = step.querySelector('.stepper-number');
+                        if (numberEl) {
+                            numberEl.innerHTML = '<i class="fas fa-check"></i>';
+                        }
+                    } else if (stepNum === stepNumber) {
+                        step.classList.add('active');
+                        const numberEl = step.querySelector('.stepper-number');
+                        if (numberEl) {
+                            numberEl.textContent = stepNum;
+                        }
+                    } else {
+                        const numberEl = step.querySelector('.stepper-number');
+                        if (numberEl) {
+                            numberEl.textContent = stepNum;
+                        }
+                    }
+                });
+                
+                currentStep = stepNumber;
+                autoSaveCurrent();
+                console.log('📍 NAVIGATED TO STEP:', stepNumber);
+            }
+            
+            // Validate Step 1 (Solution Name)
+            function validateStep1() {
+                const input = document.getElementById('solution-name-input');
+                if (!input || !input.value.trim()) {
+                    alert('Please enter a solution name before proceeding.');
+                    if (input) input.focus();
+                    return false;
+                }
+                
+                // Update current build name
+                if (currentBuildId) {
+                    const build = builds.find(b => b.id === currentBuildId);
+                    if (build) {
+                        build.name = input.value.trim();
+                        build.data = build.data || {};
+                        build.data.solutionName = input.value.trim();
+                        build.lastAccessed = new Date().toISOString();
+                        saveBuilds();
+                        renderBuilds();
+                    }
+                }
+                
+                return true;
+            }
+            
+            // Save draft
+            function saveDraft() {
+                autoSaveCurrent();
+                alert('Solution saved successfully!');
+            }
+            
+            // Add target
+            function addTarget() {
+                document.getElementById('target-type-modal').classList.add('active');
+            }
+            
+            // Close target modal
+            function closeTargetModal() {
+                document.getElementById('target-type-modal').classList.remove('active');
+            }
+            
+            // Select target type and add to list
+            function selectTargetType(type) {
+                const target = {
+                    id: Date.now().toString(),
+                    type: type,
+                    name: '',
+                    details: {}
+                };
+                
+                currentTargets.push(target);
+                renderTargets();
+                closeTargetModal();
+                
+                // Auto-save
+                if (currentBuildId) {
+                    const build = builds.find(b => b.id === currentBuildId);
+                    if (build) {
+                        build.data = build.data || {};
+                        build.data.targets = currentTargets;
+                        saveBuilds();
+                        renderBuilds();
+                    }
+                }
+                
+                console.log('✅ TARGET ADDED:', type);
+            }
+            
+            // Render targets list
+            function renderTargets() {
+                const container = document.getElementById('targets-list');
+                const emptyState = document.getElementById('empty-targets');
+                
+                if (!container) return;
+                
+                if (currentTargets.length === 0) {
+                    container.innerHTML = '';
+                    if (emptyState) emptyState.style.display = 'block';
+                    return;
+                }
+                
+                if (emptyState) emptyState.style.display = 'none';
+                
+                const iconMap = {
+                    'Person': 'fa-user',
+                    'Site': 'fa-building',
+                    'Asset': 'fa-box'
+                };
+                
+                const colorMap = {
+                    'Person': { bg: '#DBEAFE', color: '#1E40AF' },
+                    'Site': { bg: '#FEF3C7', color: '#92400E' },
+                    'Asset': { bg: '#D1FAE5', color: '#065F46' }
+                };
+                
+                container.innerHTML = currentTargets.map((target, index) => {
+                    const colors = colorMap[target.type] || { bg: '#F3F4F6', color: '#6B7280' };
+                    const icon = iconMap[target.type] || 'fa-circle';
+                    const targetName = target.name || 'Unnamed ' + target.type;
+                    
+                    return '<div class="target-card">' +
+                        '<div class="target-icon" style="background: ' + colors.bg + '; color: ' + colors.color + ';">' +
+                            '<i class="fas ' + icon + '"></i>' +
+                        '</div>' +
+                        '<div class="target-info">' +
+                            '<div class="target-type">' + target.type + '</div>' +
+                            '<div class="target-name">' + targetName + '</div>' +
+                            '<div class="target-details">Click "Next" to configure details</div>' +
+                        '</div>' +
+                        '<div class="target-actions">' +
+                            '<button class="icon-btn delete" onclick="deleteTarget(' + index + ')" title="Delete">' +
+                                '<i class="fas fa-trash"></i>' +
+                            '</button>' +
+                        '</div>' +
+                    '</div>';
+                }).join('');
+                
+                console.log('🎯 RENDERED', currentTargets.length, 'TARGETS');
+            }
+            
+            // Delete target
+            function deleteTarget(index) {
+                if (confirm('Remove this target?')) {
+                    currentTargets.splice(index, 1);
+                    renderTargets();
+                    autoSaveCurrent();
+                    console.log('🗑️ TARGET DELETED');
+                }
             }
         </script>
     </body>
