@@ -2643,7 +2643,7 @@ app.get('/solution-builder', (c) => {
                 let formHtml = '<div class="target-detail-section">';
                 formHtml += '<div class="target-detail-header">';
                 formHtml += '<div class="target-detail-icon" style="background: ' + colors.bg + '; color: ' + colors.color + ';"><i class="fas ' + icon + '"></i></div>';
-                formHtml += '<div class="target-detail-info"><h3>Configure ' + target.type + ' Details</h3><div class="target-type-label">' + target.type + ' #' + (index + 1) + '</div></div>';
+                formHtml += '<div class="target-detail-info"><h3>Configure ' + target.type + ' Details</h3><div class="target-type-label">#' + (index + 1) + ' ' + target.type.toUpperCase() + '</div></div>';
                 formHtml += '</div>';
                 
                 if (target.type === 'Person') {
@@ -2652,7 +2652,7 @@ app.get('/solution-builder', (c) => {
                     formHtml += '<div class="form-group"><label class="form-label">ID Number *</label><input type="text" class="form-input" id="person-id-' + index + '" value="' + (target.details.idNumber || '') + '" onchange="updateTargetDetail(' + index + ', &quot;idNumber&quot;, this.value)" placeholder="e.g., 12345678"></div>';
                     formHtml += '</div>';
                     formHtml += '<div class="form-grid">';
-                    formHtml += '<div class="form-group"><label class="form-label">Role *</label><select class="form-input" id="person-role-' + index + '" onchange="updateTargetDetail(' + index + ', &quot;role&quot;, this.value)"><option value="">Select role...</option><option value="Student"' + (target.details.role === 'Student' ? ' selected' : '') + '>Student</option><option value="Teacher"' + (target.details.role === 'Teacher' ? ' selected' : '') + '>Teacher</option><option value="Staff"' + (target.details.role === 'Staff' ? ' selected' : '') + '>Staff</option><option value="Administrator"' + (target.details.role === 'Administrator' ? ' selected' : '') + '>Administrator</option></select></div>';
+                    formHtml += '<div class="form-group"><label class="form-label">Role *</label><select class="form-input" id="person-role-' + index + '" onchange="updateTargetDetail(' + index + ', &quot;role&quot;, this.value)"><option value="">Select role...</option><option value="Student"' + (target.details.role === 'Student' ? ' selected' : '') + '>Student</option><option value="Teacher"' + (target.details.role === 'Teacher' ? ' selected' : '') + '>Teacher</option><option value="Staff"' + (target.details.role === 'Staff' ? ' selected' : '') + '>Staff</option><option value="Other"' + (target.details.role === 'Other' ? ' selected' : '') + '>Other</option></select></div>';
                     formHtml += '<div class="form-group"><label class="form-label">Institution</label><input type="text" class="form-input" id="person-institution-' + index + '" value="' + (target.details.institution || '') + '" onchange="updateTargetDetail(' + index + ', &quot;institution&quot;, this.value)" placeholder="e.g., ABC University"></div>';
                     formHtml += '</div>';
                 } else if (target.type === 'Site') {
@@ -2662,12 +2662,12 @@ app.get('/solution-builder', (c) => {
                     formHtml += '</div>';
                     formHtml += '<div class="form-group"><label class="form-label">Address *</label><input type="text" class="form-input" id="site-address-' + index + '" value="' + (target.details.address || '') + '" onchange="updateTargetDetail(' + index + ', &quot;address&quot;, this.value)" placeholder="e.g., 123 Main Street, City"></div>';
                     formHtml += '<div class="form-grid">';
-                    formHtml += '<div class="form-group"><label class="form-label">Total Students</label><input type="number" class="form-input" id="site-students-' + index + '" value="' + (target.details.students || '') + '" onchange="updateTargetDetail(' + index + ', &quot;students&quot;, this.value)" placeholder="e.g., 500"></div>';
+                    formHtml += '<div class="form-group"><label class="form-label">Total Personnel</label><input type="number" class="form-input" id="site-students-' + index + '" value="' + (target.details.students || '') + '" onchange="updateTargetDetail(' + index + ', &quot;students&quot;, this.value)" placeholder="e.g., 500"></div>';
                     formHtml += '<div class="form-group"><label class="form-label">Coverage Type *</label><select class="form-input" id="site-coverage-' + index + '" onchange="updateTargetDetail(' + index + ', &quot;coverage&quot;, this.value)"><option value="">Select coverage...</option><option value="Indoor"' + (target.details.coverage === 'Indoor' ? ' selected' : '') + '>Indoor Only</option><option value="Outdoor"' + (target.details.coverage === 'Outdoor' ? ' selected' : '') + '>Outdoor Only</option><option value="Both"' + (target.details.coverage === 'Both' ? ' selected' : '') + '>Indoor & Outdoor</option></select></div>';
                     formHtml += '</div>';
                 } else if (target.type === 'Asset') {
                     formHtml += '<div class="form-grid">';
-                    formHtml += '<div class="form-group"><label class="form-label">Device Type *</label><select class="form-input" id="asset-type-' + index + '" onchange="updateTargetDetail(' + index + ', &quot;deviceType&quot;, this.value)"><option value="">Select device...</option><option value="Tablet"' + (target.details.deviceType === 'Tablet' ? ' selected' : '') + '>Tablet</option><option value="Laptop"' + (target.details.deviceType === 'Laptop' ? ' selected' : '') + '>Laptop</option><option value="Router"' + (target.details.deviceType === 'Router' ? ' selected' : '') + '>Router</option><option value="Access Point"' + (target.details.deviceType === 'Access Point' ? ' selected' : '') + '>Access Point</option></select></div>';
+                    formHtml += '<div class="form-group"><label class="form-label">Asset Type *</label><select class="form-input" id="asset-type-' + index + '" onchange="updateTargetDetail(' + index + ', &quot;deviceType&quot;, this.value)"><option value="">Select asset...</option><option value="Vehicle"' + (target.details.deviceType === 'Vehicle' ? ' selected' : '') + '>Vehicle</option><option value="Equipment"' + (target.details.deviceType === 'Equipment' ? ' selected' : '') + '>Equipment</option><option value="Electronics"' + (target.details.deviceType === 'Electronics' ? ' selected' : '') + '>Electronics</option><option value="Other"' + (target.details.deviceType === 'Other' ? ' selected' : '') + '>Other</option></select></div>';
                     formHtml += '<div class="form-group"><label class="form-label">Quantity *</label><input type="number" class="form-input" id="asset-quantity-' + index + '" value="' + (target.details.quantity || '') + '" onchange="updateTargetDetail(' + index + ', &quot;quantity&quot;, this.value)" placeholder="e.g., 50" min="1"></div>';
                     formHtml += '</div>';
                     formHtml += '<div class="form-group"><label class="form-label">Specifications / Notes</label><textarea class="form-input" id="asset-specs-' + index + '" onchange="updateTargetDetail(' + index + ', &quot;specifications&quot;, this.value)" rows="3" placeholder="Additional device specifications or requirements">' + (target.details.specifications || '') + '</textarea></div>';
@@ -2737,7 +2737,7 @@ app.get('/solution-builder', (c) => {
                 let html = '<div class="solution-target-section">';
                 html += '<div class="target-detail-header">';
                 html += '<div class="target-detail-icon" style="background: ' + colors.bg + '; color: ' + colors.color + ';"><i class="fas ' + icon + '"></i></div>';
-                html += '<div class="target-detail-info"><h3>' + (target.name || target.type) + '</h3><div class="target-type-label">' + target.type + '</div></div>';
+                html += '<div class="target-detail-info"><h3>' + (target.name || target.type) + '</h3><div class="target-type-label">#' + (targetIndex + 1) + ' ' + target.type.toUpperCase() + '</div></div>';
                 html += '</div>';
                 
                 html += '<div class="solution-list">';
