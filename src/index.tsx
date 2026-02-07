@@ -2658,7 +2658,7 @@ app.get('/solution-builder', (c) => {
                 } else if (target.type === 'Site') {
                     formHtml += '<div class="form-grid">';
                     formHtml += '<div class="form-group"><label class="form-label">Site Name *</label><input type="text" class="form-input" id="site-name-' + index + '" value="' + (target.details.siteName || '') + '" onchange="updateTargetDetail(' + index + ', &quot;siteName&quot;, this.value)" placeholder="e.g., Main Campus"></div>';
-                    formHtml += '<div class="form-group"><label class="form-label">Site Type *</label><select class="form-input" id="site-type-' + index + '" onchange="updateTargetDetail(' + index + ', &quot;siteType&quot;, this.value)"><option value="">Select type...</option><option value="University"' + (target.details.siteType === 'University' ? ' selected' : '') + '>University</option><option value="High School"' + (target.details.siteType === 'High School' ? ' selected' : '') + '>High School</option><option value="Primary School"' + (target.details.siteType === 'Primary School' ? ' selected' : '') + '>Primary School</option><option value="Technical College"' + (target.details.siteType === 'Technical College' ? ' selected' : '') + '>Technical College</option></select></div>';
+                    formHtml += '<div class="form-group"><label class="form-label">Site Type *</label><select class="form-input" id="site-type-' + index + '" onchange="updateTargetDetail(' + index + ', &quot;siteType&quot;, this.value)"><option value="">Select type...</option><option value="School"' + (target.details.siteType === 'School' ? ' selected' : '') + '>School</option><option value="Technical College"' + (target.details.siteType === 'Technical College' ? ' selected' : '') + '>Technical College</option><option value="University"' + (target.details.siteType === 'University' ? ' selected' : '') + '>University</option><option value="Private"' + (target.details.siteType === 'Private' ? ' selected' : '') + '>Private</option><option value="Office"' + (target.details.siteType === 'Office' ? ' selected' : '') + '>Office</option><option value="Other"' + (target.details.siteType === 'Other' ? ' selected' : '') + '>Other</option></select></div>';
                     formHtml += '</div>';
                     formHtml += '<div class="form-group"><label class="form-label">Address *</label><input type="text" class="form-input" id="site-address-' + index + '" value="' + (target.details.address || '') + '" onchange="updateTargetDetail(' + index + ', &quot;address&quot;, this.value)" placeholder="e.g., 123 Main Street, City"></div>';
                     formHtml += '<div class="form-grid">';
@@ -2666,6 +2666,7 @@ app.get('/solution-builder', (c) => {
                     formHtml += '<div class="form-group"><label class="form-label">Coverage Type *</label><select class="form-input" id="site-coverage-' + index + '" onchange="updateTargetDetail(' + index + ', &quot;coverage&quot;, this.value)"><option value="">Select coverage...</option><option value="Indoor"' + (target.details.coverage === 'Indoor' ? ' selected' : '') + '>Indoor Only</option><option value="Outdoor"' + (target.details.coverage === 'Outdoor' ? ' selected' : '') + '>Outdoor Only</option><option value="Both"' + (target.details.coverage === 'Both' ? ' selected' : '') + '>Indoor & Outdoor</option></select></div>';
                     formHtml += '</div>';
                 } else if (target.type === 'Asset') {
+                    formHtml += '<div class="form-group"><label class="form-label">Asset Name *</label><input type="text" class="form-input" id="asset-name-' + index + '" value="' + (target.details.assetName || '') + '" onchange="updateTargetDetail(' + index + ', &quot;assetName&quot;, this.value)" placeholder="e.g., School Bus Fleet"></div>';
                     formHtml += '<div class="form-grid">';
                     formHtml += '<div class="form-group"><label class="form-label">Asset Type *</label><select class="form-input" id="asset-type-' + index + '" onchange="updateTargetDetail(' + index + ', &quot;deviceType&quot;, this.value)"><option value="">Select asset...</option><option value="Vehicle"' + (target.details.deviceType === 'Vehicle' ? ' selected' : '') + '>Vehicle</option><option value="Equipment"' + (target.details.deviceType === 'Equipment' ? ' selected' : '') + '>Equipment</option><option value="Electronics"' + (target.details.deviceType === 'Electronics' ? ' selected' : '') + '>Electronics</option><option value="Other"' + (target.details.deviceType === 'Other' ? ' selected' : '') + '>Other</option></select></div>';
                     formHtml += '<div class="form-group"><label class="form-label">Quantity *</label><input type="number" class="form-input" id="asset-quantity-' + index + '" value="' + (target.details.quantity || '') + '" onchange="updateTargetDetail(' + index + ', &quot;quantity&quot;, this.value)" placeholder="e.g., 50" min="1"></div>';
@@ -2685,12 +2686,21 @@ app.get('/solution-builder', (c) => {
                 currentTargets[index].details[field] = value;
                 
                 // Update target name based on details
+                let nameChanged = false;
                 if (currentTargets[index].type === 'Person' && field === 'name') {
                     currentTargets[index].name = value || 'Unnamed Person';
+                    nameChanged = true;
                 } else if (currentTargets[index].type === 'Site' && field === 'siteName') {
                     currentTargets[index].name = value || 'Unnamed Site';
-                } else if (currentTargets[index].type === 'Asset' && field === 'deviceType') {
+                    nameChanged = true;
+                } else if (currentTargets[index].type === 'Asset' && field === 'assetName') {
                     currentTargets[index].name = value || 'Unnamed Asset';
+                    nameChanged = true;
+                }
+                
+                // Immediately update the Defined Targets list if name changed
+                if (nameChanged) {
+                    renderTargets();
                 }
                 
                 autoSaveCurrent();
