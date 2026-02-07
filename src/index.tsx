@@ -1894,6 +1894,29 @@ app.get('/solution-builder', (c) => {
                 .action-bar button {
                     width: 100%;
                 }
+                
+                /* Stack Solution/Product/Package boxes on mobile */
+                .hierarchy-select {
+                    grid-template-columns: 1fr;
+                    gap: 0.75rem;
+                }
+                
+                /* Icon-only completion badges and remove button on mobile */
+                .completion-badge {
+                    padding: 0.375rem;
+                }
+                
+                .completion-badge .badge-text {
+                    display: none;
+                }
+                
+                .solution-remove-btn {
+                    padding: 0.5rem 0.75rem;
+                }
+                
+                .solution-remove-btn .btn-text {
+                    display: none;
+                }
             }
             
             @media (max-width: 768px) {
@@ -3111,11 +3134,11 @@ app.get('/solution-builder', (c) => {
                 
                 // Completion indicator
                 if (isComplete) {
-                    html += '<span class="completion-badge complete" title="All mandatory requirements satisfied"><i class="fas fa-check-circle"></i> Complete</span>';
+                    html += '<span class="completion-badge complete" title="All mandatory requirements satisfied"><i class="fas fa-check-circle"></i><span class="badge-text"> Complete</span></span>';
                 } else if (hasAnySolutions) {
-                    html += '<span class="completion-badge incomplete" title="Missing mandatory requirements"><i class="fas fa-exclamation-circle"></i> Incomplete</span>';
+                    html += '<span class="completion-badge incomplete" title="Missing mandatory requirements"><i class="fas fa-exclamation-circle"></i><span class="badge-text"> Incomplete</span></span>';
                 } else {
-                    html += '<span class="completion-badge pending" title="No solutions selected"><i class="fas fa-circle"></i> Pending</span>';
+                    html += '<span class="completion-badge pending" title="No solutions selected"><i class="fas fa-circle"></i><span class="badge-text"> Pending</span></span>';
                 }
                 
                 html += '</div>';
@@ -3155,7 +3178,7 @@ app.get('/solution-builder', (c) => {
                 }
                 html += '</span>';
                 if (!isMandatory) {
-                    html += '<button class="solution-remove-btn" onclick="removeSolution(' + targetIndex + ', ' + solutionIndex + ')"><i class="fas fa-trash mr-1"></i> Remove</button>';
+                    html += '<button class="solution-remove-btn" onclick="removeSolution(' + targetIndex + ', ' + solutionIndex + ')"><i class="fas fa-trash"></i><span class="btn-text"> Remove</span></button>';
                 }
                 html += '</div>';
                 
