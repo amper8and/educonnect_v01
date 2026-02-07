@@ -2755,16 +2755,13 @@ app.get('/solution-builder', (c) => {
                     const isCollapsed = sidebar.classList.contains('collapsed');
                     sidebar.classList.toggle('collapsed');
                     
-                    // FAB visibility is handled by CSS rule: .right-sidebar.collapsed ~ .chat-fab
-                    // But we ensure it's in the right state
+                    // Manage FAB visibility for desktop
+                    // The CSS rule .right-sidebar.collapsed ~ .chat-fab will handle display
+                    // We just need to ensure no inline styles interfere
                     if (fab) {
-                        if (isCollapsed) {
-                            // Was collapsed, now expanding - hide FAB
-                            fab.style.display = 'none';
-                        } else {
-                            // Was expanded, now collapsing - show FAB (CSS will handle it)
-                            fab.style.display = '';
-                        }
+                        // Remove any inline styles to let CSS rules take effect
+                        fab.style.removeProperty('display');
+                        fab.style.removeProperty('opacity');
                     }
                 }
             }
@@ -2800,27 +2797,41 @@ app.get('/solution-builder', (c) => {
                     leftSidebar.classList.remove('open');
                 }
                 
-                // Remove desktop collapsed class if present
-                sidebar.classList.remove('collapsed');
+                // Check if we're in mobile mode
+                const isMobile = window.innerWidth <= 1024;
                 
-                // Toggle mobile open class
-                const isOpen = sidebar.classList.contains('open');
-                
-                if (isOpen) {
-                    // Closing
-                    sidebar.classList.remove('open');
-                    if (overlay) overlay.style.display = 'none';
-                    if (fab) {
-                        fab.style.display = 'flex';
-                        fab.style.opacity = '1';
+                if (isMobile) {
+                    // Mobile mode: use open/closed with overlay
+                    const isOpen = sidebar.classList.contains('open');
+                    
+                    if (isOpen) {
+                        // Closing
+                        sidebar.classList.remove('open');
+                        if (overlay) overlay.style.display = 'none';
+                        if (fab) {
+                            fab.style.display = 'flex';
+                            fab.style.opacity = '1';
+                        }
+                    } else {
+                        // Opening
+                        sidebar.classList.add('open');
+                        if (overlay) overlay.style.display = 'block';
+                        if (fab) {
+                            fab.style.display = 'none';
+                            fab.style.opacity = '0';
+                        }
                     }
                 } else {
-                    // Opening
-                    sidebar.classList.add('open');
-                    if (overlay) overlay.style.display = 'block';
-                    if (fab) {
-                        fab.style.display = 'none';
-                        fab.style.opacity = '0';
+                    // Desktop mode: use collapsed/expanded (no overlay)
+                    // FAB only appears when collapsed, so clicking it should expand
+                    if (sidebar.classList.contains('collapsed')) {
+                        sidebar.classList.remove('collapsed');
+                        // CSS will hide FAB automatically when not collapsed
+                        // Remove any inline styles to let CSS rules take effect
+                        if (fab) {
+                            fab.style.removeProperty('display');
+                            fab.style.removeProperty('opacity');
+                        }
                     }
                 }
             }
