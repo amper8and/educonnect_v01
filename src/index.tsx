@@ -1568,6 +1568,19 @@ app.get('/solution-builder', (c) => {
                 width: 48px;
             }
             
+            .right-sidebar.collapsed .assistant-header,
+            .right-sidebar.collapsed .assistant-messages,
+            .right-sidebar.collapsed .chat-input-container {
+                display: none;
+            }
+            
+            /* Show chat FAB when sidebar is collapsed on desktop */
+            .right-sidebar.collapsed ~ .chat-fab {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
             .assistant-header {
                 padding: 1.5rem;
                 border-bottom: 1px solid #E5E7EB;
@@ -2241,12 +2254,12 @@ app.get('/solution-builder', (c) => {
                             </div>
                         </div>
                         
-                        <!-- Right: Annual Total & Actions -->
+                        <!-- Right: Bill Due & Actions -->
                         <div>
                             <div style="background: #FFFBF0; border: 2px solid #FFCB00; border-radius: 0.75rem; padding: 2rem; text-align: center; margin-bottom: 2rem;">
-                                <div style="font-size: 0.875rem; font-weight: 600; color: #6B7280; margin-bottom: 0.5rem;">Annual Total</div>
+                                <div style="font-size: 0.875rem; font-weight: 600; color: #6B7280; margin-bottom: 0.5rem;">Bill Due</div>
                                 <div style="font-size: 3rem; font-weight: 700; color: #000000;" id="commercials-annual-total">R 0.00</div>
-                                <div style="font-size: 0.875rem; color: #6B7280; margin-top: 0.5rem;" id="commercials-term-note">12-month contract</div>
+                                <div style="font-size: 0.875rem; color: #6B7280; margin-top: 0.5rem;" id="commercials-term-note">Due on activation</div>
                             </div>
                             
                             <div style="display: flex; flex-direction: column; gap: 1rem;">
@@ -2392,8 +2405,8 @@ app.get('/solution-builder', (c) => {
             <!-- Mobile Sidebar Overlay -->
             <div id="sidebar-overlay" class="sidebar-overlay" onclick="closeSidebars()"></div>
             
-            <!-- Floating Chat Button (Mobile Only) -->
-            <button class="chat-fab mobile-only" onclick="toggleRightSidebar()" title="AI Assistant">
+            <!-- Floating Chat Button -->
+            <button class="chat-fab" onclick="toggleRightSidebar()" title="AI Assistant">
                 <i class="fas fa-comments"></i>
             </button>
         </div>
@@ -2739,7 +2752,20 @@ app.get('/solution-builder', (c) => {
                     }
                 } else {
                     // Desktop: Use collapsed logic
+                    const isCollapsed = sidebar.classList.contains('collapsed');
                     sidebar.classList.toggle('collapsed');
+                    
+                    // FAB visibility is handled by CSS rule: .right-sidebar.collapsed ~ .chat-fab
+                    // But we ensure it's in the right state
+                    if (fab) {
+                        if (isCollapsed) {
+                            // Was collapsed, now expanding - hide FAB
+                            fab.style.display = 'none';
+                        } else {
+                            // Was expanded, now collapsing - show FAB (CSS will handle it)
+                            fab.style.display = '';
+                        }
+                    }
                 }
             }
             
@@ -3582,30 +3608,23 @@ app.get('/solution-builder', (c) => {
                     finalRecurring = finalRecurring * (1 - appliedDiscount);
                 }
                 
-                // Calculate total based on term
-                let totalAmount;
-                if (selectedTerm === 0) {
-                    // Month-to-month: show annual equivalent
-                    totalAmount = onceOff + (finalRecurring * 12);
-                } else {
-                    const months = selectedTerm;
-                    totalAmount = onceOff + (finalRecurring * months);
-                }
+                // Calculate Bill Due (immediate payment: once-off + first month)
+                const billDue = onceOff + finalRecurring;
                 
                 // Update UI
                 document.getElementById('commercials-build-name').textContent = buildName;
                 document.getElementById('commercials-solution-type').textContent = solutionSummary;
                 document.getElementById('commercials-once-off').textContent = 'R ' + onceOff.toFixed(2);
                 document.getElementById('commercials-monthly').textContent = 'R ' + finalRecurring.toFixed(2);
-                document.getElementById('commercials-annual-total').textContent = 'R ' + totalAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+                document.getElementById('commercials-annual-total').textContent = 'R ' + billDue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
                 
-                let termNote = selectedTerm === 0 ? 'Month-to-month (Annual estimate)' : selectedTerm + '-month contract total';
+                let termNote = 'Due on activation (Setup + 1st month)';
                 if (selectedTerm === 24) {
-                    termNote += ' (10% discount applied)';
+                    termNote = 'Due on activation (10% discount applied)';
                 }
                 document.getElementById('commercials-term-note').textContent = termNote;
                 
-                console.log('💰 COMMERCIALS RENDERED:', { onceOff, recurring: finalRecurring, total: totalAmount, term: selectedTerm });
+                console.log('💰 COMMERCIALS RENDERED:', { onceOff, recurring: finalRecurring, billDue, term: selectedTerm });
             }
             
             // Select contract term
