@@ -1404,7 +1404,7 @@ app.get('/solution-builder', (c) => {
                     <div class="sidebar-title">Recent History</div>
                     <button class="create-build-btn" onclick="createNewBuild()">
                         <i class="fas fa-plus"></i>
-                        Create New Build
+                        New Solution
                     </button>
                 </div>
                 <div class="build-list">
@@ -1677,7 +1677,48 @@ app.get('/solution-builder', (c) => {
             }
             
             function createNewBuild() {
-                alert('Create New Build - Coming soon!');
+                // Clear all form inputs
+                document.querySelectorAll('.form-input, .form-select, .form-textarea').forEach(input => {
+                    if (input.type === 'checkbox') {
+                        input.checked = false;
+                    } else if (input.type === 'radio') {
+                        input.checked = false;
+                    } else {
+                        input.value = '';
+                    }
+                });
+                
+                // Reset radio buttons to default (first option)
+                const firstRadio = document.querySelector('input[type="radio"]');
+                if (firstRadio) firstRadio.checked = true;
+                
+                // Reset all steps to inactive
+                document.querySelectorAll('.step-item').forEach(step => {
+                    step.classList.remove('active', 'completed');
+                });
+                
+                // Activate first step
+                document.querySelector('.step-item').classList.add('active');
+                
+                // Show first step content
+                document.querySelectorAll('.config-card').forEach(card => {
+                    card.style.display = 'none';
+                });
+                document.querySelector('.config-card').style.display = 'block';
+                
+                // Remove active state from all build items
+                document.querySelectorAll('.build-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Set focus to first input field
+                const firstInput = document.querySelector('.form-input');
+                if (firstInput) {
+                    setTimeout(() => firstInput.focus(), 100);
+                }
+                
+                console.log('✨ NEW SOLUTION STARTED');
+                console.log('Ready to configure a new educational solution');
             }
             
             // Coverage option selection
