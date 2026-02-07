@@ -1525,6 +1525,11 @@ app.get('/solution-builder', (c) => {
                 border-top: 1px solid #E5E7EB;
             }
             
+            .action-bar > div {
+                display: flex;
+                gap: 1rem;
+            }
+            
             /* Right Sidebar - AI Assistant */
             .right-sidebar {
                 background: white;
@@ -1787,6 +1792,19 @@ app.get('/solution-builder', (c) => {
                 font-size: 1.5rem;
             }
             
+            /* Sidebar Overlay for Mobile */
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 64px;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 45;
+                backdrop-filter: blur(2px);
+            }
+            
             /* Desktop/Mobile visibility helpers */
             .desktop-only {
                 display: block;
@@ -1861,10 +1879,20 @@ app.get('/solution-builder', (c) => {
                     grid-template-columns: 1fr;
                 }
                 
-                /* Hide FAB when right sidebar is open */
-                .right-sidebar.open ~ .chat-fab {
-                    opacity: 0;
-                    pointer-events: none;
+                /* Stack action bar buttons vertically on mobile */
+                .action-bar {
+                    flex-direction: column;
+                    gap: 0.75rem;
+                }
+                
+                .action-bar > div {
+                    width: 100%;
+                    flex-direction: column;
+                    gap: 0.75rem;
+                }
+                
+                .action-bar button {
+                    width: 100%;
                 }
             }
             
@@ -1876,6 +1904,10 @@ app.get('/solution-builder', (c) => {
                 .right-sidebar {
                     width: 100%;
                     right: -100%;
+                }
+                
+                .right-sidebar.open {
+                    right: 0;
                 }
                 
                 .left-sidebar {
@@ -2233,6 +2265,9 @@ app.get('/solution-builder', (c) => {
                 </div>
             </div>
             
+            <!-- Mobile Sidebar Overlay -->
+            <div id="sidebar-overlay" class="sidebar-overlay" onclick="closeSidebars()"></div>
+            
             <!-- Floating Chat Button (Mobile Only) -->
             <button class="chat-fab mobile-only" onclick="toggleRightSidebar()" title="AI Assistant">
                 <i class="fas fa-comments"></i>
@@ -2557,11 +2592,44 @@ app.get('/solution-builder', (c) => {
             
             // Mobile sidebar toggles
             function toggleLeftSidebar() {
-                document.getElementById('left-sidebar').classList.toggle('open');
+                const sidebar = document.getElementById('left-sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                
+                sidebar.classList.toggle('open');
+                
+                if (sidebar.classList.contains('open')) {
+                    overlay.style.display = 'block';
+                } else {
+                    overlay.style.display = 'none';
+                }
             }
             
             function toggleRightSidebar() {
-                document.getElementById('right-sidebar').classList.toggle('open');
+                const sidebar = document.getElementById('right-sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                const fab = document.querySelector('.chat-fab');
+                
+                sidebar.classList.toggle('open');
+                
+                if (sidebar.classList.contains('open')) {
+                    overlay.style.display = 'block';
+                    if (fab) fab.style.display = 'none';
+                } else {
+                    overlay.style.display = 'none';
+                    if (fab) fab.style.display = 'flex';
+                }
+            }
+            
+            function closeSidebars() {
+                const leftSidebar = document.getElementById('left-sidebar');
+                const rightSidebar = document.getElementById('right-sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                const fab = document.querySelector('.chat-fab');
+                
+                leftSidebar.classList.remove('open');
+                rightSidebar.classList.remove('open');
+                overlay.style.display = 'none';
+                if (fab) fab.style.display = 'flex';
             }
             
             // Toggle Mandatory Rules Info Box
