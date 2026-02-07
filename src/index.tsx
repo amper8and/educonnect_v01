@@ -1747,7 +1747,7 @@ app.get('/solution-builder', (c) => {
                     const canDelete = build.status === 'saved';
                     const canArchive = build.status === 'active' || build.status === 'offered';
                     
-                    let html = '<div class="build-item ' + (isActive ? 'active' : '') + '" onclick="loadBuild(\'' + build.id + '\')" style="position: relative;">';
+                    let html = '<div class="build-item ' + (isActive ? 'active' : '') + '" onclick="loadBuild(&quot;' + build.id + '&quot;)" style="position: relative;">';
                     html += '<div class="build-item-header">';
                     html += '<div style="display: flex; align-items: flex-start; flex: 1;">';
                     html += '<div class="build-icon"><i class="fas fa-folder"></i></div>';
@@ -1758,11 +1758,11 @@ app.get('/solution-builder', (c) => {
                     html += '</div></div></div>';
                     
                     if (canDelete) {
-                        html += '<button class="delete-btn" onclick="event.stopPropagation(); deleteBuild(\'' + build.id + '\')" title="Delete" style="position: absolute; top: 0.5rem; right: 0.5rem; background: #EF4444; color: white; border: none; border-radius: 4px; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;"><i class="fas fa-trash"></i></button>';
+                        html += '<button class="delete-btn" onclick="event.stopPropagation(); deleteBuild(&quot;' + build.id + '&quot;)" title="Delete" style="position: absolute; top: 0.5rem; right: 0.5rem; background: #EF4444; color: white; border: none; border-radius: 4px; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;"><i class="fas fa-trash"></i></button>';
                     }
                     
                     if (canArchive) {
-                        html += '<button class="archive-btn" onclick="event.stopPropagation(); archiveBuild(\'' + build.id + '\')" title="Archive" style="position: absolute; top: 0.5rem; right: 0.5rem; background: #6B7280; color: white; border: none; border-radius: 4px; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;"><i class="fas fa-archive"></i></button>';
+                        html += '<button class="archive-btn" onclick="event.stopPropagation(); archiveBuild(&quot;' + build.id + '&quot;)" title="Archive" style="position: absolute; top: 0.5rem; right: 0.5rem; background: #6B7280; color: white; border: none; border-radius: 4px; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;"><i class="fas fa-archive"></i></button>';
                     }
                     
                     html += '</div>';
