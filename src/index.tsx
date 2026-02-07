@@ -1353,6 +1353,38 @@ app.get('/solution-builder', (c) => {
                 color: #000;
             }
             
+            /* Completion Badge Styles */
+            .completion-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.375rem;
+                padding: 0.25rem 0.75rem;
+                border-radius: 9999px;
+                font-size: 0.75rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.025em;
+            }
+            
+            .completion-badge.complete {
+                background: #D1FAE5;
+                color: #065F46;
+            }
+            
+            .completion-badge.incomplete {
+                background: #FEE2E2;
+                color: #991B1B;
+            }
+            
+            .completion-badge.pending {
+                background: #F3F4F6;
+                color: #6B7280;
+            }
+            
+            .completion-badge i {
+                font-size: 0.875rem;
+            }
+            
             .config-card {
                 background: white;
                 border-radius: 0.75rem;
@@ -1918,19 +1950,22 @@ app.get('/solution-builder', (c) => {
                         <p class="card-subtitle">Choose connectivity solutions for each target</p>
                     </div>
                     
-                    <!-- Mandatory Rules Info Box -->
-                    <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 1rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
-                        <div style="display: flex; align-items: start; gap: 0.75rem;">
-                            <i class="fas fa-info-circle" style="color: #F59E0B; margin-top: 0.25rem;"></i>
-                            <div>
-                                <strong style="color: #92400E;">Mandatory Selection Rules:</strong>
-                                <ul style="margin: 0.5rem 0 0 1.25rem; color: #78350F; font-size: 0.875rem;">
-                                    <li><strong>EduStudent:</strong> AI-Mobile is automatically added (mandatory). Must select one Education Prepaid package.</li>
-                                    <li><strong>EduFlex:</strong> Must select one Uncapped Wireless package.</li>
-                                    <li><strong>EduSchool:</strong> Must select one Education Fibre package.</li>
-                                    <li><strong>EduSafe:</strong> No mandatory requirements.</li>
-                                </ul>
+                    <!-- Mandatory Rules Info Box (Collapsible) -->
+                    <div id="rules-info-box" style="background: #FEF3C7; border-left: 4px solid #F59E0B; margin-bottom: 1.5rem; border-radius: 0.5rem; overflow: hidden;">
+                        <div onclick="toggleRulesBox()" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; cursor: pointer; user-select: none;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <i class="fas fa-info-circle" style="color: #F59E0B;"></i>
+                                <strong style="color: #92400E;">Mandatory Selection Rules</strong>
                             </div>
+                            <i id="rules-toggle-icon" class="fas fa-chevron-up" style="color: #F59E0B; transition: transform 0.3s;"></i>
+                        </div>
+                        <div id="rules-content" style="padding: 0 1rem 1rem 1rem;">
+                            <ul style="margin: 0.5rem 0 0 1.25rem; color: #78350F; font-size: 0.875rem;">
+                                <li><strong>EduStudent:</strong> AI-Mobile is automatically added (mandatory). Must select one Education Prepaid package.</li>
+                                <li><strong>EduFlex:</strong> Must select one Uncapped Wireless package.</li>
+                                <li><strong>EduSchool:</strong> Must select one Education Fibre package.</li>
+                                <li><strong>EduSafe:</strong> No mandatory requirements.</li>
+                            </ul>
                         </div>
                     </div>
                     
@@ -2407,6 +2442,24 @@ app.get('/solution-builder', (c) => {
                 document.getElementById('right-sidebar').classList.toggle('open');
             }
             
+            // Toggle Mandatory Rules Info Box
+            function toggleRulesBox() {
+                const content = document.getElementById('rules-content');
+                const icon = document.getElementById('rules-toggle-icon');
+                
+                if (content.style.display === 'none') {
+                    content.style.display = 'block';
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    content.style.display = 'none';
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            }
+            
             // ============================================
             // MULTI-STEP WORKFLOW FUNCTIONS (Delivery 3)
             // ============================================
@@ -2794,10 +2847,30 @@ app.get('/solution-builder', (c) => {
                     target.solutions = [];
                 }
                 
+                // Check if solution selection is complete for this target
+                const validation = validateSolutionRules(targetIndex);
+                const isComplete = validation.valid && target.solutions.length > 0;
+                const hasAnySolutions = target.solutions.length > 0;
+                
                 let html = '<div class="solution-target-section">';
                 html += '<div class="target-detail-header">';
                 html += '<div class="target-detail-icon" style="background: ' + colors.bg + '; color: ' + colors.color + ';"><i class="fas ' + icon + '"></i></div>';
-                html += '<div class="target-detail-info"><h3>' + (target.name || target.type) + '</h3><div class="target-type-label">#' + (targetIndex + 1) + ' ' + target.type.toUpperCase() + '</div></div>';
+                html += '<div class="target-detail-info">';
+                html += '<div style="display: flex; align-items: center; gap: 0.75rem;">';
+                html += '<h3>' + (target.name || target.type) + '</h3>';
+                
+                // Completion indicator
+                if (isComplete) {
+                    html += '<span class="completion-badge complete" title="All mandatory requirements satisfied"><i class="fas fa-check-circle"></i> Complete</span>';
+                } else if (hasAnySolutions) {
+                    html += '<span class="completion-badge incomplete" title="Missing mandatory requirements"><i class="fas fa-exclamation-circle"></i> Incomplete</span>';
+                } else {
+                    html += '<span class="completion-badge pending" title="No solutions selected"><i class="fas fa-circle"></i> Pending</span>';
+                }
+                
+                html += '</div>';
+                html += '<div class="target-type-label">#' + (targetIndex + 1) + ' ' + target.type.toUpperCase() + '</div>';
+                html += '</div>';
                 html += '</div>';
                 
                 html += '<div class="solution-list">';
