@@ -1912,6 +1912,11 @@ app.get('/solution-builder', (c) => {
                 
                 .left-sidebar {
                     width: 280px;
+                    left: -280px;  /* Match width to fully hide */
+                }
+                
+                .left-sidebar.open {
+                    left: 0;
                 }
             }
         </style>
@@ -2594,6 +2599,12 @@ app.get('/solution-builder', (c) => {
             function toggleLeftSidebar() {
                 const sidebar = document.getElementById('left-sidebar');
                 const overlay = document.getElementById('sidebar-overlay');
+                const rightSidebar = document.getElementById('right-sidebar');
+                
+                // Close right sidebar if open
+                if (rightSidebar.classList.contains('open')) {
+                    rightSidebar.classList.remove('open');
+                }
                 
                 sidebar.classList.toggle('open');
                 
@@ -2608,15 +2619,35 @@ app.get('/solution-builder', (c) => {
                 const sidebar = document.getElementById('right-sidebar');
                 const overlay = document.getElementById('sidebar-overlay');
                 const fab = document.querySelector('.chat-fab');
+                const leftSidebar = document.getElementById('left-sidebar');
                 
-                sidebar.classList.toggle('open');
+                // Close left sidebar if open
+                if (leftSidebar.classList.contains('open')) {
+                    leftSidebar.classList.remove('open');
+                }
                 
-                if (sidebar.classList.contains('open')) {
-                    overlay.style.display = 'block';
-                    if (fab) fab.style.display = 'none';
-                } else {
+                // Remove desktop collapsed class if present
+                sidebar.classList.remove('collapsed');
+                
+                // Toggle mobile open class
+                const isOpen = sidebar.classList.contains('open');
+                
+                if (isOpen) {
+                    // Closing
+                    sidebar.classList.remove('open');
                     overlay.style.display = 'none';
-                    if (fab) fab.style.display = 'flex';
+                    if (fab) {
+                        fab.style.display = 'flex';
+                        fab.style.opacity = '1';
+                    }
+                } else {
+                    // Opening
+                    sidebar.classList.add('open');
+                    overlay.style.display = 'block';
+                    if (fab) {
+                        fab.style.display = 'none';
+                        fab.style.opacity = '0';
+                    }
                 }
             }
             
