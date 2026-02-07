@@ -1278,6 +1278,25 @@ app.get('/solution-builder', (c) => {
                 position: relative;
             }
             
+            .mandatory-solution {
+                background: #FEF3C7;
+                border: 2px solid #F59E0B;
+                position: relative;
+            }
+            
+            .mandatory-solution::before {
+                content: '⚠️ Mandatory';
+                position: absolute;
+                top: -12px;
+                left: 12px;
+                background: #F59E0B;
+                color: white;
+                padding: 2px 8px;
+                border-radius: 4px;
+                font-size: 0.75rem;
+                font-weight: 700;
+            }
+            
             .solution-item-header {
                 display: flex;
                 align-items: center;
@@ -1899,6 +1918,22 @@ app.get('/solution-builder', (c) => {
                         <p class="card-subtitle">Choose connectivity solutions for each target</p>
                     </div>
                     
+                    <!-- Mandatory Rules Info Box -->
+                    <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 1rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
+                        <div style="display: flex; align-items: start; gap: 0.75rem;">
+                            <i class="fas fa-info-circle" style="color: #F59E0B; margin-top: 0.25rem;"></i>
+                            <div>
+                                <strong style="color: #92400E;">Mandatory Selection Rules:</strong>
+                                <ul style="margin: 0.5rem 0 0 1.25rem; color: #78350F; font-size: 0.875rem;">
+                                    <li><strong>EduStudent:</strong> AI-Mobile is automatically added (mandatory). Must select one Education Prepaid package.</li>
+                                    <li><strong>EduFlex:</strong> Must select one Uncapped Wireless package.</li>
+                                    <li><strong>EduSchool:</strong> Must select one Education Fibre package.</li>
+                                    <li><strong>EduSafe:</strong> No mandatory requirements.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div id="solution-selection-container"></div>
                     
                     <div class="action-bar">
@@ -2389,6 +2424,19 @@ app.get('/solution-builder', (c) => {
                         alert('Please add at least one target before proceeding.');
                         return;
                     }
+                    // Validate solution rules when leaving Step 4
+                    if (stepNumber === 5 && currentStep === 4) {
+                        // Validate each target that has solutions
+                        for (let i = 0; i < currentTargets.length; i++) {
+                            if (currentTargets[i].solutions && currentTargets[i].solutions.length > 0) {
+                                const validation = validateSolutionRules(i);
+                                if (!validation.valid) {
+                                    alert('Solution Selection Error for ' + currentTargets[i].name + ':\\n\\n' + validation.message);
+                                    return;
+                                }
+                            }
+                        }
+                    }
                 }
                 
                 // Hide all steps
@@ -2774,11 +2822,18 @@ app.get('/solution-builder', (c) => {
             
             function renderSolutionItem(target, targetIndex, solution, solutionIndex) {
                 const availableSolutions = compatibilityRules[target.type] || [];
+                const isMandatory = solution.isMandatory || false;
                 
-                let html = '<div class="solution-item">';
+                let html = '<div class="solution-item' + (isMandatory ? ' mandatory-solution' : '') + '">';
                 html += '<div class="solution-item-header">';
-                html += '<span class="solution-item-number">Solution #' + (solutionIndex + 1) + '</span>';
-                html += '<button class="solution-remove-btn" onclick="removeSolution(' + targetIndex + ', ' + solutionIndex + ')"><i class="fas fa-trash mr-1"></i> Remove</button>';
+                html += '<span class="solution-item-number">Solution #' + (solutionIndex + 1);
+                if (isMandatory) {
+                    html += ' <span style="color: #DC2626; font-size: 0.75rem; font-weight: 600; margin-left: 0.5rem;">MANDATORY</span>';
+                }
+                html += '</span>';
+                if (!isMandatory) {
+                    html += '<button class="solution-remove-btn" onclick="removeSolution(' + targetIndex + ', ' + solutionIndex + ')"><i class="fas fa-trash mr-1"></i> Remove</button>';
+                }
                 html += '</div>';
                 
                 html += '<div class="hierarchy-select">';
@@ -2786,7 +2841,7 @@ app.get('/solution-builder', (c) => {
                 // Solution dropdown
                 html += '<div class="form-group">';
                 html += '<label class="form-label">Solution *</label>';
-                html += '<select class="form-input" onchange="updateSolution(' + targetIndex + ', ' + solutionIndex + ', &quot;solution&quot;, this.value)">';
+                html += '<select class="form-input" onchange="updateSolution(' + targetIndex + ', ' + solutionIndex + ', &quot;solution&quot;, this.value)"' + (isMandatory ? ' disabled' : '') + '>';
                 html += '<option value="">Select solution...</option>';
                 availableSolutions.forEach(sol => {
                     const selected = solution.solution === sol ? ' selected' : '';
@@ -2798,7 +2853,7 @@ app.get('/solution-builder', (c) => {
                 // Product dropdown
                 html += '<div class="form-group">';
                 html += '<label class="form-label">Product *</label>';
-                html += '<select class="form-input" onchange="updateSolution(' + targetIndex + ', ' + solutionIndex + ', &quot;product&quot;, this.value)">';
+                html += '<select class="form-input" onchange="updateSolution(' + targetIndex + ', ' + solutionIndex + ', &quot;product&quot;, this.value)"' + (isMandatory ? ' disabled' : '') + '>';
                 html += '<option value="">Select product...</option>';
                 if (solution.solution && solutionLibrary[solution.solution]) {
                     Object.keys(solutionLibrary[solution.solution].products).forEach(prod => {
@@ -2812,7 +2867,7 @@ app.get('/solution-builder', (c) => {
                 // Package dropdown
                 html += '<div class="form-group">';
                 html += '<label class="form-label">Package *</label>';
-                html += '<select class="form-input" onchange="updateSolution(' + targetIndex + ', ' + solutionIndex + ', &quot;package&quot;, this.value)">';
+                html += '<select class="form-input" onchange="updateSolution(' + targetIndex + ', ' + solutionIndex + ', &quot;package&quot;, this.value)"' + (isMandatory ? ' disabled' : '') + '>';
                 html += '<option value="">Select package...</option>';
                 if (solution.solution && solution.product && solutionLibrary[solution.solution] && solutionLibrary[solution.solution].products[solution.product]) {
                     solutionLibrary[solution.solution].products[solution.product].forEach(pkg => {
@@ -2870,12 +2925,117 @@ app.get('/solution-builder', (c) => {
                 if (field === 'solution') {
                     currentTargets[targetIndex].solutions[solutionIndex].product = '';
                     currentTargets[targetIndex].solutions[solutionIndex].package = '';
+                    
+                    // Apply mandatory rules when solution is selected
+                    applyMandatoryRules(targetIndex, value);
                 } else if (field === 'product') {
                     currentTargets[targetIndex].solutions[solutionIndex].package = '';
                 }
                 
                 renderSolutionSelection();
                 autoSaveCurrent();
+            }
+            
+            // Apply mandatory selection rules for each solution
+            function applyMandatoryRules(targetIndex, selectedSolution) {
+                if (!currentTargets[targetIndex].solutions) {
+                    currentTargets[targetIndex].solutions = [];
+                }
+                
+                const solutions = currentTargets[targetIndex].solutions;
+                
+                // Rule 1: EduStudent - Mandatory AI-Mobile
+                if (selectedSolution === 'EduStudent') {
+                    // Check if AI-Mobile is already added
+                    const hasAIMobile = solutions.some(sol => 
+                        sol.solution === 'EduStudent' && sol.product === 'AI-Mobile'
+                    );
+                    
+                    if (!hasAIMobile) {
+                        // Auto-add AI-Mobile with its only package
+                        solutions.push({
+                            solution: 'EduStudent',
+                            product: 'AI-Mobile',
+                            package: '4EC + AI Tutor',
+                            quantity: 1,
+                            isMandatory: true
+                        });
+                        console.log('✅ AUTO-ADDED: AI-Mobile (Mandatory for EduStudent)');
+                    }
+                }
+            }
+            
+            // Validate solution selection rules before proceeding
+            function validateSolutionRules(targetIndex) {
+                const target = currentTargets[targetIndex];
+                if (!target.solutions || target.solutions.length === 0) {
+                    return { valid: true, message: '' }; // No solutions selected yet
+                }
+                
+                const solutions = target.solutions;
+                const solutionTypes = [...new Set(solutions.map(s => s.solution).filter(s => s))];
+                
+                // Rule 1: EduStudent must have Education Prepaid
+                if (solutionTypes.includes('EduStudent')) {
+                    const hasEducationPrepaid = solutions.some(sol => 
+                        sol.solution === 'EduStudent' && 
+                        sol.product === 'Education Prepaid' && 
+                        sol.package
+                    );
+                    const hasAIMobile = solutions.some(sol => 
+                        sol.solution === 'EduStudent' && 
+                        sol.product === 'AI-Mobile'
+                    );
+                    
+                    if (!hasEducationPrepaid) {
+                        return {
+                            valid: false,
+                            message: 'EduStudent requires one Education Prepaid package to be selected.'
+                        };
+                    }
+                    if (!hasAIMobile) {
+                        return {
+                            valid: false,
+                            message: 'EduStudent requires AI-Mobile (this should be auto-added).'
+                        };
+                    }
+                }
+                
+                // Rule 2: EduFlex must have Uncapped Wireless
+                if (solutionTypes.includes('EduFlex')) {
+                    const hasUncappedWireless = solutions.some(sol => 
+                        sol.solution === 'EduFlex' && 
+                        sol.product === 'Uncapped Wireless' && 
+                        sol.package
+                    );
+                    
+                    if (!hasUncappedWireless) {
+                        return {
+                            valid: false,
+                            message: 'EduFlex requires one Uncapped Wireless package to be selected.'
+                        };
+                    }
+                }
+                
+                // Rule 3: EduSchool must have Education Fibre
+                if (solutionTypes.includes('EduSchool')) {
+                    const hasEducationFibre = solutions.some(sol => 
+                        sol.solution === 'EduSchool' && 
+                        sol.product === 'Education Fibre' && 
+                        sol.package
+                    );
+                    
+                    if (!hasEducationFibre) {
+                        return {
+                            valid: false,
+                            message: 'EduSchool requires one Education Fibre package to be selected.'
+                        };
+                    }
+                }
+                
+                // Rule 4: EduSafe has no mandatory rules (optional)
+                
+                return { valid: true, message: '' };
             }
         </script>
     </body>
