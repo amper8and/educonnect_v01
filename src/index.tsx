@@ -1212,6 +1212,128 @@ app.get('/solution-builder', (c) => {
                 margin-top: 0.5rem;
             }
             
+            /* Target Detail Forms */
+            .target-detail-section {
+                border: 2px solid #E5E7EB;
+                border-radius: 0.75rem;
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+                background: #F9FAFB;
+            }
+            
+            .target-detail-header {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 2px solid #E5E7EB;
+            }
+            
+            .target-detail-icon {
+                width: 48px;
+                height: 48px;
+                border-radius: 0.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.25rem;
+                flex-shrink: 0;
+            }
+            
+            .target-detail-info h3 {
+                font-size: 1.125rem;
+                font-weight: 700;
+                margin: 0 0 0.25rem 0;
+            }
+            
+            .target-detail-info .target-type-label {
+                font-size: 0.75rem;
+                color: #6B7280;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+            
+            /* Solution Selection */
+            .solution-target-section {
+                border: 2px solid #E5E7EB;
+                border-radius: 0.75rem;
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+                background: white;
+            }
+            
+            .solution-list {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                margin-top: 1rem;
+            }
+            
+            .solution-item {
+                background: #F9FAFB;
+                border: 2px solid #E5E7EB;
+                border-radius: 0.75rem;
+                padding: 1.5rem;
+                position: relative;
+            }
+            
+            .solution-item-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 1rem;
+            }
+            
+            .solution-item-number {
+                font-weight: 700;
+                color: #6B7280;
+                font-size: 0.875rem;
+            }
+            
+            .solution-remove-btn {
+                background: #FEE2E2;
+                color: #EF4444;
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: 0.5rem;
+                cursor: pointer;
+                font-size: 0.875rem;
+                font-weight: 600;
+                transition: all 0.2s;
+            }
+            
+            .solution-remove-btn:hover {
+                background: #EF4444;
+                color: white;
+            }
+            
+            .hierarchy-select {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .add-solution-btn {
+                width: 100%;
+                padding: 1rem;
+                border: 2px dashed #D1D5DB;
+                border-radius: 0.75rem;
+                background: white;
+                color: #6B7280;
+                cursor: pointer;
+                font-weight: 600;
+                transition: all 0.2s;
+                margin-top: 1rem;
+            }
+            
+            .add-solution-btn:hover {
+                border-color: #FFCB00;
+                background: #FFFBF0;
+                color: #000;
+            }
+            
             .config-card {
                 background: white;
                 border-radius: 0.75rem;
@@ -1746,29 +1868,51 @@ app.get('/solution-builder', (c) => {
                     </div>
                 </div>
                 
-                <!-- Step 3: Target Details (Placeholder for Delivery 4) -->
+                <!-- Step 3: Target Details -->
                 <div class="config-card step-content" id="step-3" style="display: none;">
                     <div class="step-header">
-                        <h2 class="card-title">Target Details</h2>
-                        <p class="card-subtitle">Provide specific details for each target</p>
+                        <h2 class="card-title">Configure Target Details</h2>
+                        <p class="card-subtitle">Provide specific information for each target</p>
                     </div>
-                    <div style="padding: 3rem; text-align: center; color: #6B7280;">
-                        <i class="fas fa-wrench" style="font-size: 3rem; margin-bottom: 1rem; color: #D1D5DB;"></i>
-                        <p style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Step 3: Coming in Delivery 4</p>
-                        <p>Target-specific detail forms will be implemented next</p>
+                    
+                    <div id="target-details-container"></div>
+                    
+                    <div class="action-bar">
+                        <button type="button" class="btn btn-secondary" onclick="goToStep(2)">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <div style="display: flex; gap: 1rem;">
+                            <button type="button" class="btn btn-outline" onclick="saveDraft()">
+                                <i class="fas fa-save mr-2"></i> Save Draft
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="goToStep(4)">
+                                Next: Select Solutions <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
-                <!-- Step 4: Solution Selection (Placeholder for Delivery 4) -->
+                <!-- Step 4: Solution Selection -->
                 <div class="config-card step-content" id="step-4" style="display: none;">
                     <div class="step-header">
-                        <h2 class="card-title">Solution Selection</h2>
-                        <p class="card-subtitle">Choose solutions for each target</p>
+                        <h2 class="card-title">Select Solutions</h2>
+                        <p class="card-subtitle">Choose connectivity solutions for each target</p>
                     </div>
-                    <div style="padding: 3rem; text-align: center; color: #6B7280;">
-                        <i class="fas fa-puzzle-piece" style="font-size: 3rem; margin-bottom: 1rem; color: #D1D5DB;"></i>
-                        <p style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Step 4: Coming in Delivery 4</p>
-                        <p>Solution selection with hierarchy will be implemented next</p>
+                    
+                    <div id="solution-selection-container"></div>
+                    
+                    <div class="action-bar">
+                        <button type="button" class="btn btn-secondary" onclick="goToStep(3)">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <div style="display: flex; gap: 1rem;">
+                            <button type="button" class="btn btn-outline" onclick="saveDraft()">
+                                <i class="fas fa-save mr-2"></i> Save Draft
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="goToStep(5)">
+                                Next: Review Commercials <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
@@ -2258,6 +2402,13 @@ app.get('/solution-builder', (c) => {
                     targetStepEl.style.display = 'block';
                 }
                 
+                // Render step-specific content
+                if (stepNumber === 3) {
+                    renderTargetDetails();
+                } else if (stepNumber === 4) {
+                    renderSolutionSelection();
+                }
+                
                 // Update stepper UI
                 document.querySelectorAll('.stepper-step').forEach((step, index) => {
                     const stepNum = index + 1;
@@ -2416,6 +2567,303 @@ app.get('/solution-builder', (c) => {
                     autoSaveCurrent();
                     console.log('🗑️ TARGET DELETED');
                 }
+            }
+
+            
+            // ============================================
+            // SOLUTION LIBRARY DATA (from Excel)
+            // ============================================
+            const solutionLibrary = {
+                'EduStudent': {
+                    products: {
+                        'Standard': ['100MB', '200MB', '500MB'],
+                        'Premium': ['1GB', '2GB', '5GB']
+                    }
+                },
+                'EduSafe': {
+                    products: {
+                        'Basic': ['Device Protection', 'Content Filtering'],
+                        'Advanced': ['Full Security Suite', 'Parental Controls']
+                    }
+                },
+                'EduFlex': {
+                    products: {
+                        'Shared': ['10Mbps', '20Mbps', '50Mbps'],
+                        'Dedicated': ['100Mbps', '500Mbps', '1Gbps']
+                    }
+                },
+                'EduSchool': {
+                    products: {
+                        'Basic': ['25Mbps', '50Mbps'],
+                        'Enhanced': ['100Mbps', '200Mbps', '500Mbps']
+                    }
+                }
+            };
+            
+            // Compatibility rules
+            const compatibilityRules = {
+                'Person': ['EduStudent', 'EduSafe'],
+                'Site': ['EduFlex', 'EduSchool'],
+                'Asset': ['EduSafe']
+            };
+            
+            // ============================================
+            // STEP 3: TARGET DETAILS FUNCTIONS
+            // ============================================
+            function renderTargetDetails() {
+                const container = document.getElementById('target-details-container');
+                if (!container) return;
+                
+                if (currentTargets.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; padding: 3rem; color: #6B7280;"><i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i><p>No targets defined. Go back to Step 2 to add targets.</p></div>';
+                    return;
+                }
+                
+                container.innerHTML = currentTargets.map((target, index) => {
+                    return renderTargetDetailForm(target, index);
+                }).join('');
+            }
+            
+            function renderTargetDetailForm(target, index) {
+                const iconMap = {
+                    'Person': 'fa-user',
+                    'Site': 'fa-building',
+                    'Asset': 'fa-box'
+                };
+                
+                const colorMap = {
+                    'Person': { bg: '#DBEAFE', color: '#1E40AF' },
+                    'Site': { bg: '#FEF3C7', color: '#92400E' },
+                    'Asset': { bg: '#D1FAE5', color: '#065F46' }
+                };
+                
+                const colors = colorMap[target.type] || { bg: '#F3F4F6', color: '#6B7280' };
+                const icon = iconMap[target.type] || 'fa-circle';
+                
+                let formHtml = '<div class="target-detail-section">';
+                formHtml += '<div class="target-detail-header">';
+                formHtml += '<div class="target-detail-icon" style="background: ' + colors.bg + '; color: ' + colors.color + ';"><i class="fas ' + icon + '"></i></div>';
+                formHtml += '<div class="target-detail-info"><h3>Configure ' + target.type + ' Details</h3><div class="target-type-label">' + target.type + ' #' + (index + 1) + '</div></div>';
+                formHtml += '</div>';
+                
+                if (target.type === 'Person') {
+                    formHtml += '<div class="form-grid">';
+                    formHtml += '<div class="form-group"><label class="form-label">Full Name *</label><input type="text" class="form-input" id="person-name-' + index + '" value="' + (target.details.name || '') + '" onchange="updateTargetDetail(' + index + ', &quot;name&quot;, this.value)" placeholder="e.g., John Doe"></div>';
+                    formHtml += '<div class="form-group"><label class="form-label">ID Number *</label><input type="text" class="form-input" id="person-id-' + index + '" value="' + (target.details.idNumber || '') + '" onchange="updateTargetDetail(' + index + ', &quot;idNumber&quot;, this.value)" placeholder="e.g., 12345678"></div>';
+                    formHtml += '</div>';
+                    formHtml += '<div class="form-grid">';
+                    formHtml += '<div class="form-group"><label class="form-label">Role *</label><select class="form-input" id="person-role-' + index + '" onchange="updateTargetDetail(' + index + ', &quot;role&quot;, this.value)"><option value="">Select role...</option><option value="Student"' + (target.details.role === 'Student' ? ' selected' : '') + '>Student</option><option value="Teacher"' + (target.details.role === 'Teacher' ? ' selected' : '') + '>Teacher</option><option value="Staff"' + (target.details.role === 'Staff' ? ' selected' : '') + '>Staff</option><option value="Administrator"' + (target.details.role === 'Administrator' ? ' selected' : '') + '>Administrator</option></select></div>';
+                    formHtml += '<div class="form-group"><label class="form-label">Institution</label><input type="text" class="form-input" id="person-institution-' + index + '" value="' + (target.details.institution || '') + '" onchange="updateTargetDetail(' + index + ', &quot;institution&quot;, this.value)" placeholder="e.g., ABC University"></div>';
+                    formHtml += '</div>';
+                } else if (target.type === 'Site') {
+                    formHtml += '<div class="form-grid">';
+                    formHtml += '<div class="form-group"><label class="form-label">Site Name *</label><input type="text" class="form-input" id="site-name-' + index + '" value="' + (target.details.siteName || '') + '" onchange="updateTargetDetail(' + index + ', &quot;siteName&quot;, this.value)" placeholder="e.g., Main Campus"></div>';
+                    formHtml += '<div class="form-group"><label class="form-label">Site Type *</label><select class="form-input" id="site-type-' + index + '" onchange="updateTargetDetail(' + index + ', &quot;siteType&quot;, this.value)"><option value="">Select type...</option><option value="University"' + (target.details.siteType === 'University' ? ' selected' : '') + '>University</option><option value="High School"' + (target.details.siteType === 'High School' ? ' selected' : '') + '>High School</option><option value="Primary School"' + (target.details.siteType === 'Primary School' ? ' selected' : '') + '>Primary School</option><option value="Technical College"' + (target.details.siteType === 'Technical College' ? ' selected' : '') + '>Technical College</option></select></div>';
+                    formHtml += '</div>';
+                    formHtml += '<div class="form-group"><label class="form-label">Address *</label><input type="text" class="form-input" id="site-address-' + index + '" value="' + (target.details.address || '') + '" onchange="updateTargetDetail(' + index + ', &quot;address&quot;, this.value)" placeholder="e.g., 123 Main Street, City"></div>';
+                    formHtml += '<div class="form-grid">';
+                    formHtml += '<div class="form-group"><label class="form-label">Total Students</label><input type="number" class="form-input" id="site-students-' + index + '" value="' + (target.details.students || '') + '" onchange="updateTargetDetail(' + index + ', &quot;students&quot;, this.value)" placeholder="e.g., 500"></div>';
+                    formHtml += '<div class="form-group"><label class="form-label">Coverage Type *</label><select class="form-input" id="site-coverage-' + index + '" onchange="updateTargetDetail(' + index + ', &quot;coverage&quot;, this.value)"><option value="">Select coverage...</option><option value="Indoor"' + (target.details.coverage === 'Indoor' ? ' selected' : '') + '>Indoor Only</option><option value="Outdoor"' + (target.details.coverage === 'Outdoor' ? ' selected' : '') + '>Outdoor Only</option><option value="Both"' + (target.details.coverage === 'Both' ? ' selected' : '') + '>Indoor & Outdoor</option></select></div>';
+                    formHtml += '</div>';
+                } else if (target.type === 'Asset') {
+                    formHtml += '<div class="form-grid">';
+                    formHtml += '<div class="form-group"><label class="form-label">Device Type *</label><select class="form-input" id="asset-type-' + index + '" onchange="updateTargetDetail(' + index + ', &quot;deviceType&quot;, this.value)"><option value="">Select device...</option><option value="Tablet"' + (target.details.deviceType === 'Tablet' ? ' selected' : '') + '>Tablet</option><option value="Laptop"' + (target.details.deviceType === 'Laptop' ? ' selected' : '') + '>Laptop</option><option value="Router"' + (target.details.deviceType === 'Router' ? ' selected' : '') + '>Router</option><option value="Access Point"' + (target.details.deviceType === 'Access Point' ? ' selected' : '') + '>Access Point</option></select></div>';
+                    formHtml += '<div class="form-group"><label class="form-label">Quantity *</label><input type="number" class="form-input" id="asset-quantity-' + index + '" value="' + (target.details.quantity || '') + '" onchange="updateTargetDetail(' + index + ', &quot;quantity&quot;, this.value)" placeholder="e.g., 50" min="1"></div>';
+                    formHtml += '</div>';
+                    formHtml += '<div class="form-group"><label class="form-label">Specifications / Notes</label><textarea class="form-input" id="asset-specs-' + index + '" onchange="updateTargetDetail(' + index + ', &quot;specifications&quot;, this.value)" rows="3" placeholder="Additional device specifications or requirements">' + (target.details.specifications || '') + '</textarea></div>';
+                }
+                
+                formHtml += '</div>';
+                return formHtml;
+            }
+            
+            function updateTargetDetail(index, field, value) {
+                if (!currentTargets[index]) return;
+                if (!currentTargets[index].details) {
+                    currentTargets[index].details = {};
+                }
+                currentTargets[index].details[field] = value;
+                
+                // Update target name based on details
+                if (currentTargets[index].type === 'Person' && field === 'name') {
+                    currentTargets[index].name = value || 'Unnamed Person';
+                } else if (currentTargets[index].type === 'Site' && field === 'siteName') {
+                    currentTargets[index].name = value || 'Unnamed Site';
+                } else if (currentTargets[index].type === 'Asset' && field === 'deviceType') {
+                    currentTargets[index].name = value || 'Unnamed Asset';
+                }
+                
+                autoSaveCurrent();
+            }
+            
+            // ============================================
+            // STEP 4: SOLUTION SELECTION FUNCTIONS
+            // ============================================
+            function renderSolutionSelection() {
+                const container = document.getElementById('solution-selection-container');
+                if (!container) return;
+                
+                if (currentTargets.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; padding: 3rem; color: #6B7280;"><i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i><p>No targets defined. Go back to Step 2 to add targets.</p></div>';
+                    return;
+                }
+                
+                container.innerHTML = currentTargets.map((target, targetIndex) => {
+                    return renderTargetSolutions(target, targetIndex);
+                }).join('');
+            }
+            
+            function renderTargetSolutions(target, targetIndex) {
+                const iconMap = {
+                    'Person': 'fa-user',
+                    'Site': 'fa-building',
+                    'Asset': 'fa-box'
+                };
+                
+                const colorMap = {
+                    'Person': { bg: '#DBEAFE', color: '#1E40AF' },
+                    'Site': { bg: '#FEF3C7', color: '#92400E' },
+                    'Asset': { bg: '#D1FAE5', color: '#065F46' }
+                };
+                
+                const colors = colorMap[target.type] || { bg: '#F3F4F6', color: '#6B7280' };
+                const icon = iconMap[target.type] || 'fa-circle';
+                
+                // Initialize solutions array if not exists
+                if (!target.solutions) {
+                    target.solutions = [];
+                }
+                
+                let html = '<div class="solution-target-section">';
+                html += '<div class="target-detail-header">';
+                html += '<div class="target-detail-icon" style="background: ' + colors.bg + '; color: ' + colors.color + ';"><i class="fas ' + icon + '"></i></div>';
+                html += '<div class="target-detail-info"><h3>' + (target.name || target.type) + '</h3><div class="target-type-label">' + target.type + '</div></div>';
+                html += '</div>';
+                
+                html += '<div class="solution-list">';
+                
+                // Render existing solutions
+                if (target.solutions.length > 0) {
+                    target.solutions.forEach((solution, solutionIndex) => {
+                        html += renderSolutionItem(target, targetIndex, solution, solutionIndex);
+                    });
+                } else {
+                    html += '<p style="text-align: center; color: #6B7280; padding: 1rem;">No solutions selected yet. Click "Add Solution" below.</p>';
+                }
+                
+                html += '</div>';
+                
+                // Add solution button
+                html += '<button class="add-solution-btn" onclick="addSolution(' + targetIndex + ')"><i class="fas fa-plus mr-2"></i> Add Solution for ' + target.type + '</button>';
+                
+                html += '</div>';
+                return html;
+            }
+            
+            function renderSolutionItem(target, targetIndex, solution, solutionIndex) {
+                const availableSolutions = compatibilityRules[target.type] || [];
+                
+                let html = '<div class="solution-item">';
+                html += '<div class="solution-item-header">';
+                html += '<span class="solution-item-number">Solution #' + (solutionIndex + 1) + '</span>';
+                html += '<button class="solution-remove-btn" onclick="removeSolution(' + targetIndex + ', ' + solutionIndex + ')"><i class="fas fa-trash mr-1"></i> Remove</button>';
+                html += '</div>';
+                
+                html += '<div class="hierarchy-select">';
+                
+                // Solution dropdown
+                html += '<div class="form-group">';
+                html += '<label class="form-label">Solution *</label>';
+                html += '<select class="form-input" onchange="updateSolution(' + targetIndex + ', ' + solutionIndex + ', &quot;solution&quot;, this.value)">';
+                html += '<option value="">Select solution...</option>';
+                availableSolutions.forEach(sol => {
+                    const selected = solution.solution === sol ? ' selected' : '';
+                    html += '<option value="' + sol + '"' + selected + '>' + sol + '</option>';
+                });
+                html += '</select>';
+                html += '</div>';
+                
+                // Product dropdown
+                html += '<div class="form-group">';
+                html += '<label class="form-label">Product *</label>';
+                html += '<select class="form-input" onchange="updateSolution(' + targetIndex + ', ' + solutionIndex + ', &quot;product&quot;, this.value)">';
+                html += '<option value="">Select product...</option>';
+                if (solution.solution && solutionLibrary[solution.solution]) {
+                    Object.keys(solutionLibrary[solution.solution].products).forEach(prod => {
+                        const selected = solution.product === prod ? ' selected' : '';
+                        html += '<option value="' + prod + '"' + selected + '>' + prod + '</option>';
+                    });
+                }
+                html += '</select>';
+                html += '</div>';
+                
+                // Package dropdown
+                html += '<div class="form-group">';
+                html += '<label class="form-label">Package *</label>';
+                html += '<select class="form-input" onchange="updateSolution(' + targetIndex + ', ' + solutionIndex + ', &quot;package&quot;, this.value)">';
+                html += '<option value="">Select package...</option>';
+                if (solution.solution && solution.product && solutionLibrary[solution.solution] && solutionLibrary[solution.solution].products[solution.product]) {
+                    solutionLibrary[solution.solution].products[solution.product].forEach(pkg => {
+                        const selected = solution.package === pkg ? ' selected' : '';
+                        html += '<option value="' + pkg + '"' + selected + '>' + pkg + '</option>';
+                    });
+                }
+                html += '</select>';
+                html += '</div>';
+                
+                html += '</div>';
+                
+                // Quantity input
+                html += '<div class="form-group" style="margin-top: 1rem;">';
+                html += '<label class="form-label">Quantity *</label>';
+                html += '<input type="number" class="form-input" value="' + (solution.quantity || 1) + '" onchange="updateSolution(' + targetIndex + ', ' + solutionIndex + ', &quot;quantity&quot;, this.value)" min="1" placeholder="e.g., 10">';
+                html += '</div>';
+                
+                html += '</div>';
+                return html;
+            }
+            
+            function addSolution(targetIndex) {
+                if (!currentTargets[targetIndex].solutions) {
+                    currentTargets[targetIndex].solutions = [];
+                }
+                
+                currentTargets[targetIndex].solutions.push({
+                    solution: '',
+                    product: '',
+                    package: '',
+                    quantity: 1
+                });
+                
+                renderSolutionSelection();
+                autoSaveCurrent();
+                console.log('➕ SOLUTION ADDED to target', targetIndex);
+            }
+            
+            function removeSolution(targetIndex, solutionIndex) {
+                if (confirm('Remove this solution?')) {
+                    currentTargets[targetIndex].solutions.splice(solutionIndex, 1);
+                    renderSolutionSelection();
+                    autoSaveCurrent();
+                    console.log('➖ SOLUTION REMOVED from target', targetIndex);
+                }
+            }
+            
+            function updateSolution(targetIndex, solutionIndex, field, value) {
+                if (!currentTargets[targetIndex].solutions[solutionIndex]) return;
+                
+                currentTargets[targetIndex].solutions[solutionIndex][field] = value;
+                
+                // Clear dependent fields when parent changes
+                if (field === 'solution') {
+                    currentTargets[targetIndex].solutions[solutionIndex].product = '';
+                    currentTargets[targetIndex].solutions[solutionIndex].package = '';
+                } else if (field === 'product') {
+                    currentTargets[targetIndex].solutions[solutionIndex].package = '';
+                }
+                
+                renderSolutionSelection();
+                autoSaveCurrent();
             }
         </script>
     </body>
