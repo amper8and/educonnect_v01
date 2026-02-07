@@ -2592,7 +2592,36 @@ app.get('/solution-builder', (c) => {
             // UI FUNCTIONS
             // ============================================
             function toggleAssistant() {
-                document.getElementById('right-sidebar').classList.toggle('collapsed');
+                const sidebar = document.getElementById('right-sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                const fab = document.querySelector('.chat-fab');
+                
+                // Check if we're in mobile mode (window width <= 1024px)
+                const isMobile = window.innerWidth <= 1024;
+                
+                if (isMobile) {
+                    // Mobile: Use open/close logic
+                    const isOpen = sidebar.classList.contains('open');
+                    
+                    if (isOpen) {
+                        sidebar.classList.remove('open');
+                        if (overlay) overlay.style.display = 'none';
+                        if (fab) {
+                            fab.style.display = 'flex';
+                            fab.style.opacity = '1';
+                        }
+                    } else {
+                        sidebar.classList.add('open');
+                        if (overlay) overlay.style.display = 'block';
+                        if (fab) {
+                            fab.style.display = 'none';
+                            fab.style.opacity = '0';
+                        }
+                    }
+                } else {
+                    // Desktop: Use collapsed logic
+                    sidebar.classList.toggle('collapsed');
+                }
             }
             
             // Mobile sidebar toggles
@@ -2622,7 +2651,7 @@ app.get('/solution-builder', (c) => {
                 const leftSidebar = document.getElementById('left-sidebar');
                 
                 // Close left sidebar if open
-                if (leftSidebar.classList.contains('open')) {
+                if (leftSidebar && leftSidebar.classList.contains('open')) {
                     leftSidebar.classList.remove('open');
                 }
                 
@@ -2635,7 +2664,7 @@ app.get('/solution-builder', (c) => {
                 if (isOpen) {
                     // Closing
                     sidebar.classList.remove('open');
-                    overlay.style.display = 'none';
+                    if (overlay) overlay.style.display = 'none';
                     if (fab) {
                         fab.style.display = 'flex';
                         fab.style.opacity = '1';
@@ -2643,7 +2672,7 @@ app.get('/solution-builder', (c) => {
                 } else {
                     // Opening
                     sidebar.classList.add('open');
-                    overlay.style.display = 'block';
+                    if (overlay) overlay.style.display = 'block';
                     if (fab) {
                         fab.style.display = 'none';
                         fab.style.opacity = '0';
