@@ -2573,34 +2573,36 @@ app.get('/solution-builder', (c) => {
             // ============================================
             // SOLUTION LIBRARY DATA (from Excel)
             // ============================================
+            // SOLUTION LIBRARY DATA (from EduConnect Solution Library.xlsx)
+            // ============================================
             const solutionLibrary = {
                 'EduStudent': {
                     products: {
-                        'Standard': ['100MB', '200MB', '500MB'],
-                        'Premium': ['1GB', '2GB', '5GB']
-                    }
-                },
-                'EduSafe': {
-                    products: {
-                        'Basic': ['Device Protection', 'Content Filtering'],
-                        'Advanced': ['Full Security Suite', 'Parental Controls']
+                        'Education Prepaid': ['Small - 5GB + 50mins', 'Medium - 10GB + 100mins', 'Large - 25GB + 200mins'],
+                        'AI-Mobile': ['4EC + AI Tutor']
                     }
                 },
                 'EduFlex': {
                     products: {
-                        'Shared': ['10Mbps', '20Mbps', '50Mbps'],
-                        'Dedicated': ['100Mbps', '500Mbps', '1Gbps']
+                        'Uncapped Wireless': ['FWA Lite - 10Mbps', 'FWA Standard - 50Mbps', 'FWA Extra - 100Mbps']
                     }
                 },
                 'EduSchool': {
                     products: {
-                        'Basic': ['25Mbps', '50Mbps'],
-                        'Enhanced': ['100Mbps', '200Mbps', '500Mbps']
+                        'Education Fibre': ['Fibre Lite - 50Mbps', 'Fibree Standard - 200Mbps', 'Fibre Extra - 500Mbps'],
+                        'Campus WiFi': ['APN + Eagle Eye + Security']
+                    }
+                },
+                'EduSafe': {
+                    products: {
+                        'PowerFleet - Vision AI': ['AI Video', 'AI Dash Cam'],
+                        'PowerFleet - MiX': ['Vehicle Telematics'],
+                        'PowerFleet - MyPanic': ['Panic / Emergency App']
                     }
                 }
             };
             
-            // Compatibility rules
+            // Compatibility rules (Target Type -> Available Solutions)
             const compatibilityRules = {
                 'Person': ['EduStudent', 'EduSafe'],
                 'Site': ['EduFlex', 'EduSchool'],
