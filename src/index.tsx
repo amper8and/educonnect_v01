@@ -1738,9 +1738,91 @@ app.get('/solution-builder', (c) => {
             }
             
             /* Mobile Responsive */
+            /* Mobile Menu Button */
+            .mobile-menu-btn {
+                display: none;
+                background: none;
+                border: none;
+                color: #6B7280;
+                font-size: 1.25rem;
+                cursor: pointer;
+                padding: 0.5rem;
+                border-radius: 0.5rem;
+                transition: all 0.2s;
+            }
+            
+            .mobile-menu-btn:hover {
+                background: #F3F4F6;
+                color: #000;
+            }
+            
+            /* Floating Action Button (Chat FAB) */
+            .chat-fab {
+                display: none;
+                position: fixed;
+                bottom: 24px;
+                right: 24px;
+                width: 56px;
+                height: 56px;
+                background: #FFCB00;
+                border: none;
+                border-radius: 50%;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                cursor: pointer;
+                z-index: 100;
+                transition: all 0.3s;
+            }
+            
+            .chat-fab:hover {
+                transform: scale(1.1);
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+            }
+            
+            .chat-fab:active {
+                transform: scale(0.95);
+            }
+            
+            .chat-fab i {
+                color: #000;
+                font-size: 1.5rem;
+            }
+            
+            /* Desktop/Mobile visibility helpers */
+            .desktop-only {
+                display: block;
+            }
+            
+            .mobile-only {
+                display: none;
+            }
+            
             @media (max-width: 1024px) {
                 .builder-container {
                     grid-template-columns: 1fr;
+                }
+                
+                /* Show mobile controls */
+                .mobile-menu-btn {
+                    display: block;
+                }
+                
+                .mobile-only {
+                    display: block;
+                }
+                
+                .desktop-only {
+                    display: none;
+                }
+                
+                .chat-fab {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                
+                /* Hide logo text on small screens */
+                .logo-text {
+                    display: none;
                 }
                 
                 .left-sidebar {
@@ -1751,6 +1833,8 @@ app.get('/solution-builder', (c) => {
                     width: 240px;
                     z-index: 50;
                     transition: left 0.3s;
+                    background: white;
+                    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
                 }
                 
                 .left-sidebar.open {
@@ -1765,6 +1849,8 @@ app.get('/solution-builder', (c) => {
                     width: 360px;
                     z-index: 50;
                     transition: right 0.3s;
+                    background: white;
+                    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
                 }
                 
                 .right-sidebar.open {
@@ -1774,6 +1860,27 @@ app.get('/solution-builder', (c) => {
                 .form-grid {
                     grid-template-columns: 1fr;
                 }
+                
+                /* Hide FAB when right sidebar is open */
+                .right-sidebar.open ~ .chat-fab {
+                    opacity: 0;
+                    pointer-events: none;
+                }
+            }
+            
+            @media (max-width: 768px) {
+                .logo-section span {
+                    font-size: 0.875rem;
+                }
+                
+                .right-sidebar {
+                    width: 100%;
+                    right: -100%;
+                }
+                
+                .left-sidebar {
+                    width: 280px;
+                }
             }
         </style>
     </head>
@@ -1782,21 +1889,31 @@ app.get('/solution-builder', (c) => {
             <!-- Header -->
             <div class="header">
                 <div class="header-left">
+                    <!-- Mobile Menu Button (Left Sidebar) -->
+                    <button class="mobile-menu-btn" onclick="toggleLeftSidebar()" title="Toggle Build History">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
                     <div class="logo-section">
                         <div class="logo-icon">
                             <i class="fas fa-network-wired"></i>
                         </div>
-                        <span>EduConnect Solution Builder</span>
+                        <span class="logo-text">EduConnect Solution Builder</span>
                     </div>
                 </div>
                 <div class="header-right">
-                    <a href="/dashboard" class="nav-link">Dashboard</a>
-                    <a href="/solution-builder" class="nav-link active">Solutions</a>
-                    <a href="/dashboard" class="nav-link">Reports</a>
+                    <a href="/dashboard" class="nav-link desktop-only">Dashboard</a>
+                    <a href="/solution-builder" class="nav-link active desktop-only">Solutions</a>
+                    <a href="/dashboard" class="nav-link desktop-only">Reports</a>
                     <button class="icon-button">
                         <i class="fas fa-bell"></i>
                     </button>
                     <div class="user-avatar">JM</div>
+                    
+                    <!-- Mobile Menu Button (Right Sidebar - AI Assistant) -->
+                    <button class="mobile-menu-btn mobile-only" onclick="toggleRightSidebar()" title="Toggle AI Assistant">
+                        <i class="fas fa-robot"></i>
+                    </button>
                 </div>
             </div>
             
@@ -2115,6 +2232,11 @@ app.get('/solution-builder', (c) => {
                     </div>
                 </div>
             </div>
+            
+            <!-- Floating Chat Button (Mobile Only) -->
+            <button class="chat-fab mobile-only" onclick="toggleRightSidebar()" title="AI Assistant">
+                <i class="fas fa-comments"></i>
+            </button>
         </div>
         
         <script>
