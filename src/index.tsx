@@ -913,6 +913,11 @@ app.get('/solution-builder', (c) => {
                 color: #92400E;
             }
             
+            .status-archived {
+                background: #E5E7EB;
+                color: #374151;
+            }
+            
             /* Center Panel - Main Content */
             .main-content {
                 overflow-y: auto;
@@ -2274,6 +2279,9 @@ app.get('/solution-builder', (c) => {
                                 </button>
                                 <button onclick="activateBuild()" style="padding: 1rem; background: #FFCB00; color: #000; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1rem;">
                                     <i class="fas fa-check-circle"></i> Activate
+                                </button>
+                                <button onclick="archiveCurrentBuild()" style="padding: 1rem; background: #6B7280; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1rem;">
+                                    <i class="fas fa-archive"></i> Archive
                                 </button>
                             </div>
                         </div>
@@ -3684,35 +3692,68 @@ app.get('/solution-builder', (c) => {
             
             // Save build
             function saveBuild() {
+                if (!currentBuildId) return;
+                
+                const build = builds.find(b => b.id === currentBuildId);
+                if (!build) return;
+                
+                // Keep status as 'saved' - this is the draft state
+                build.status = 'saved';
+                build.lastAccessed = new Date().toISOString();
                 autoSaveCurrent();
+                renderBuilds();
+                
                 alert('✅ Build saved successfully!\\n\\nYour solution has been saved and can be accessed from the Recent History.');
+                console.log('💾 BUILD SAVED:', build.name);
             }
             
             // Generate offer
             function generateOffer() {
+                if (!currentBuildId) return;
+                
+                const build = builds.find(b => b.id === currentBuildId);
+                if (!build) return;
+                
                 const buildName = document.getElementById('build-name')?.value || 'Untitled Build';
                 const { onceOff, recurring } = calculatePricing();
                 
-                alert('📄 Generate Offer\\\\n\\\\nBuild: ' + buildName + '\\\\nOnce-off: R ' + onceOff.toFixed(2) + '\\\\nMonthly: R ' + recurring.toFixed(2) + '\\\\n\\\\nThis feature will create a professional PDF offer document for Account and Admin users.\\\\n\\\\n(Feature in development)');
-                console.log('📄 OFFER GENERATION REQUESTED');
+                // Update status to 'offered'
+                build.status = 'offered';
+                build.lastAccessed = new Date().toISOString();
+                autoSaveCurrent();
+                renderBuilds();
+                
+                alert('📄 Offer Generated!\\\\n\\\\nBuild: ' + buildName + '\\\\nOnce-off: R ' + onceOff.toFixed(2) + '\\\\nMonthly: R ' + recurring.toFixed(2) + '\\\\n\\\\nStatus changed to OFFERED.\\\\n\\\\nA professional PDF offer document will be created for Account and Admin users.\\\\n\\\\n(PDF generation in development)');
+                console.log('📄 OFFER GENERATED - Status: offered');
             }
             
             // Activate build
             function activateBuild() {
+                if (!currentBuildId) return;
+                
+                const build = builds.find(b => b.id === currentBuildId);
+                if (!build) return;
+                
                 const buildName = document.getElementById('build-name')?.value || 'Untitled Build';
                 const { onceOff, recurring } = calculatePricing();
-                let totalAmount;
+                const billDue = onceOff + recurring;
                 
-                if (selectedTerm === 0) {
-                    totalAmount = onceOff + (recurring * 12);
-                } else {
-                    totalAmount = onceOff + (recurring * selectedTerm);
+                if (confirm('🚀 Activate Build?\\\\n\\\\nBuild: ' + buildName + '\\\\nBill Due: R ' + billDue.toFixed(2) + '\\\\n\\\\nThis will change status to ACTIVE and proceed to checkout.')) {
+                    // Update status to 'active'
+                    build.status = 'active';
+                    build.lastAccessed = new Date().toISOString();
+                    autoSaveCurrent();
+                    renderBuilds();
+                    
+                    alert('✅ Build Activated!\\\\n\\\\nStatus changed to ACTIVE.\\\\n\\\\nProceeding to checkout and payment flow.\\\\n\\\\n(Checkout feature in development)');
+                    console.log('🚀 BUILD ACTIVATED - Status: active');
                 }
-                
-                if (confirm('🚀 Activate Build?\\\\n\\\\nBuild: ' + buildName + '\\\\nTotal: R ' + totalAmount.toFixed(2) + '\\\\n\\\\nThis will proceed to checkout and payment.')) {
-                    alert('✅ Build activated!\\\\n\\\\nProceeding to checkout and payment flow.\\\\n\\\\n(Feature in development)');
-                    console.log('🚀 BUILD ACTIVATED');
-                }
+            }
+            
+            // Archive current build
+            function archiveCurrentBuild() {
+                if (!currentBuildId) return;
+                archiveBuild(currentBuildId);
             }
         </script>
     </body>
