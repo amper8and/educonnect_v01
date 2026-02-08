@@ -1997,7 +1997,7 @@ app.get('/solution-builder', (c) => {
                 <div class="header-right">
                     <a href="/dashboard" class="nav-link desktop-only">Dashboard</a>
                     <a href="/solution-builder" class="nav-link active desktop-only">Solutions</a>
-                    <a href="/dashboard" class="nav-link desktop-only">Reports</a>
+                    <a href="/reports" class="nav-link desktop-only">Reports</a>
                     <button class="icon-button">
                         <i class="fas fa-bell"></i>
                     </button>
@@ -3759,6 +3759,795 @@ app.get('/solution-builder', (c) => {
                 if (!currentBuildId) return;
                 archiveBuild(currentBuildId);
             }
+        </script>
+    </body>
+    </html>
+  `)
+})
+
+// Status Report page
+app.get('/reports', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Status Report - EduConnect</title>
+        <link href="/static/css/design-system.css" rel="stylesheet">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            
+            body {
+                font-family: 'MTN Brighter Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                background: #F9FAFB;
+                overflow-x: hidden;
+            }
+            
+            /* Report Container */
+            .report-container {
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            /* Header Bar */
+            .report-header {
+                background: white;
+                border-bottom: 1px solid #E5E7EB;
+                padding: 1.5rem 2rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+            
+            .header-left {
+                display: flex;
+                align-items: center;
+                gap: 1.5rem;
+            }
+            
+            .logo-image {
+                height: 32px;
+                width: auto;
+            }
+            
+            .report-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #000;
+            }
+            
+            .date-selector {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                background: #F9FAFB;
+                padding: 0.5rem 1rem;
+                border-radius: 0.5rem;
+                border: 1px solid #E5E7EB;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+            
+            .date-selector:hover {
+                border-color: #FFCB00;
+                background: white;
+            }
+            
+            .date-selector input {
+                border: none;
+                background: transparent;
+                font-size: 0.875rem;
+                color: #374151;
+                cursor: pointer;
+            }
+            
+            /* Key Metrics Bar */
+            .metrics-bar {
+                background: white;
+                padding: 1.5rem 2rem;
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1.5rem;
+                border-bottom: 1px solid #E5E7EB;
+            }
+            
+            .metric-card {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                padding: 1.5rem;
+                background: #F9FAFB;
+                border-radius: 0.75rem;
+                border: 1px solid #E5E7EB;
+                transition: all 0.3s;
+            }
+            
+            .metric-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+            
+            .metric-icon {
+                width: 48px;
+                height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 0.5rem;
+                font-size: 1.5rem;
+            }
+            
+            .metric-icon.yellow {
+                background: #FFCB00;
+                color: #000;
+            }
+            
+            .metric-icon.blue {
+                background: #DBEAFE;
+                color: #1E40AF;
+            }
+            
+            .metric-icon.green {
+                background: #D1FAE5;
+                color: #065F46;
+            }
+            
+            .metric-icon.orange {
+                background: #FEF3C7;
+                color: #92400E;
+            }
+            
+            .metric-content {
+                flex: 1;
+            }
+            
+            .metric-label {
+                font-size: 0.875rem;
+                color: #6B7280;
+                margin-bottom: 0.25rem;
+            }
+            
+            .metric-value {
+                font-size: 1.75rem;
+                font-weight: 700;
+                color: #000;
+                line-height: 1;
+            }
+            
+            .metric-trend {
+                font-size: 0.75rem;
+                color: #10B981;
+                margin-top: 0.25rem;
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+            }
+            
+            /* Main Content */
+            .report-content {
+                flex: 1;
+                padding: 2rem;
+                overflow-y: auto;
+            }
+            
+            /* Tabs */
+            .tabs-container {
+                display: flex;
+                gap: 1rem;
+                margin-bottom: 2rem;
+                border-bottom: 2px solid #E5E7EB;
+            }
+            
+            .tab {
+                padding: 0.75rem 1.5rem;
+                background: transparent;
+                border: none;
+                border-bottom: 3px solid transparent;
+                color: #6B7280;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+                font-size: 0.875rem;
+            }
+            
+            .tab:hover {
+                color: #000;
+            }
+            
+            .tab.active {
+                color: #000;
+                border-bottom-color: #FFCB00;
+            }
+            
+            /* Dropdown for filter tabs */
+            .tab-dropdown {
+                position: relative;
+                display: inline-block;
+            }
+            
+            .dropdown-content {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                background: white;
+                border: 1px solid #E5E7EB;
+                border-radius: 0.5rem;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                min-width: 200px;
+                z-index: 100;
+                margin-top: 0.5rem;
+            }
+            
+            .tab-dropdown:hover .dropdown-content {
+                display: block;
+            }
+            
+            .dropdown-content a {
+                display: block;
+                padding: 0.75rem 1rem;
+                color: #374151;
+                text-decoration: none;
+                transition: background 0.2s;
+            }
+            
+            .dropdown-content a:hover {
+                background: #F9FAFB;
+            }
+            
+            /* Charts Grid */
+            .charts-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+                margin-bottom: 2rem;
+            }
+            
+            .chart-card {
+                background: white;
+                border-radius: 0.75rem;
+                padding: 1.5rem;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+            
+            .chart-title {
+                font-size: 1rem;
+                font-weight: 700;
+                color: #000;
+                margin-bottom: 1.5rem;
+            }
+            
+            .chart-container {
+                position: relative;
+                height: 300px;
+            }
+            
+            /* Recent Activity Table */
+            .activity-card {
+                background: white;
+                border-radius: 0.75rem;
+                padding: 1.5rem;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+            
+            .activity-title {
+                font-size: 1rem;
+                font-weight: 700;
+                color: #000;
+                margin-bottom: 1.5rem;
+            }
+            
+            .activity-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            
+            .activity-table thead {
+                background: #F9FAFB;
+            }
+            
+            .activity-table th {
+                text-align: left;
+                padding: 0.75rem 1rem;
+                font-size: 0.75rem;
+                font-weight: 700;
+                color: #6B7280;
+                text-transform: uppercase;
+                border-bottom: 1px solid #E5E7EB;
+            }
+            
+            .activity-table td {
+                padding: 1rem;
+                border-bottom: 1px solid #F3F4F6;
+                font-size: 0.875rem;
+                color: #374151;
+            }
+            
+            .activity-table tbody tr:hover {
+                background: #F9FAFB;
+            }
+            
+            .status-badge {
+                display: inline-block;
+                padding: 0.25rem 0.75rem;
+                border-radius: 0.25rem;
+                font-size: 0.75rem;
+                font-weight: 600;
+            }
+            
+            .status-active {
+                background: #DBEAFE;
+                color: #1E40AF;
+            }
+            
+            .status-offered {
+                background: #FEF3C7;
+                color: #92400E;
+            }
+            
+            .status-saved {
+                background: #D1FAE5;
+                color: #065F46;
+            }
+            
+            /* Mobile Responsive */
+            @media (max-width: 1024px) {
+                .metrics-bar {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+                
+                .charts-grid {
+                    grid-template-columns: 1fr;
+                }
+                
+                .report-header {
+                    flex-direction: column;
+                    gap: 1rem;
+                    align-items: flex-start;
+                }
+                
+                .activity-table {
+                    font-size: 0.75rem;
+                }
+                
+                .activity-table th,
+                .activity-table td {
+                    padding: 0.5rem;
+                }
+            }
+            
+            @media (max-width: 640px) {
+                .metrics-bar {
+                    grid-template-columns: 1fr;
+                }
+                
+                .report-content {
+                    padding: 1rem;
+                }
+                
+                .tabs-container {
+                    flex-wrap: wrap;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="report-container">
+            <!-- Header -->
+            <div class="report-header">
+                <div class="header-left">
+                    <img src="/static/images/logos/EduConnect_landscape_logo.png" alt="EduConnect" class="logo-image">
+                    <h1 class="report-title">Status Report</h1>
+                </div>
+                <div class="date-selector">
+                    <i class="fas fa-calendar"></i>
+                    <input type="text" id="dateRange" value="Oct 1, 2023 - Oct 31, 2023" readonly>
+                </div>
+            </div>
+            
+            <!-- Key Metrics -->
+            <div class="metrics-bar">
+                <div class="metric-card">
+                    <div class="metric-icon yellow">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-label">Total Solutions</div>
+                        <div class="metric-value" id="totalSolutions">0</div>
+                        <div class="metric-trend">
+                            <i class="fas fa-arrow-up"></i>
+                            <span id="totalTrend">+12% vs last month</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon blue">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-label">Activated Solutions</div>
+                        <div class="metric-value" id="activatedSolutions">0</div>
+                        <div class="metric-trend">
+                            <i class="fas fa-arrow-up"></i>
+                            <span id="activatedTrend">+8% vs last week</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon green">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-label">Next Payment</div>
+                        <div class="metric-value" id="nextPayment">R 0</div>
+                        <div class="metric-trend">
+                            <i class="fas fa-arrow-up"></i>
+                            <span id="nextPaymentTrend">+8% growth</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon orange">
+                        <i class="fas fa-filter"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-label">YTD Payments</div>
+                        <div class="metric-value" id="ytdPayments">R 0</div>
+                        <div class="metric-trend">
+                            <i class="fas fa-arrow-up"></i>
+                            <span id="ytdTrend">+2% improvement</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="report-content">
+                <!-- Tabs -->
+                <div class="tabs-container">
+                    <button class="tab active" onclick="switchTab('overview')">Overview</button>
+                    <div class="tab-dropdown">
+                        <button class="tab" onclick="switchTab('solution')">
+                            By Solution <i class="fas fa-chevron-down" style="font-size: 0.75rem;"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="#" onclick="filterBySolution('EduStudent'); return false;">EduStudent</a>
+                            <a href="#" onclick="filterBySolution('EduFlex'); return false;">EduFlex</a>
+                            <a href="#" onclick="filterBySolution('EduSchool'); return false;">EduSchool</a>
+                            <a href="#" onclick="filterBySolution('EduSafe'); return false;">EduSafe</a>
+                        </div>
+                    </div>
+                    <div class="tab-dropdown">
+                        <button class="tab" onclick="switchTab('target')">
+                            By Target <i class="fas fa-chevron-down" style="font-size: 0.75rem;"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="#" onclick="filterByTarget('Person'); return false;">Persons</a>
+                            <a href="#" onclick="filterByTarget('Site'); return false;">Sites</a>
+                            <a href="#" onclick="filterByTarget('Asset'); return false;">Assets</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3 class="chart-title">Monthly Spend</h3>
+                        <div class="chart-container">
+                            <canvas id="monthlySpendChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3 class="chart-title">Solution Profile</h3>
+                        <div class="chart-container">
+                            <canvas id="solutionProfileChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="activity-card">
+                    <h3 class="activity-title">Recent Activity</h3>
+                    <table class="activity-table">
+                        <thead>
+                            <tr>
+                                <th>Build Name</th>
+                                <th>Target</th>
+                                <th>Solution</th>
+                                <th>Status</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activityTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            // Initialize data from localStorage
+            function loadBuilds() {
+                const saved = localStorage.getItem('educonnect_builds');
+                return saved ? JSON.parse(saved) : [];
+            }
+            
+            // Calculate metrics
+            function calculateMetrics() {
+                const builds = loadBuilds();
+                
+                // Total solutions
+                const totalSolutions = builds.length;
+                document.getElementById('totalSolutions').textContent = totalSolutions;
+                
+                // Activated solutions
+                const activatedSolutions = builds.filter(b => b.status === 'active').length;
+                document.getElementById('activatedSolutions').textContent = activatedSolutions;
+                
+                // Calculate next payment (sum of monthly recurring for active solutions)
+                let nextPayment = 0;
+                let ytdPayment = 0;
+                
+                builds.forEach(build => {
+                    if (build.status === 'active' && build.data && build.data.targets) {
+                        build.data.targets.forEach(target => {
+                            if (target.solutions) {
+                                target.solutions.forEach(solution => {
+                                    const quantity = solution.quantity || 1;
+                                    
+                                    // Calculate monthly recurring
+                                    if (solution.name === 'EduStudent - Education Prepaid') {
+                                        const price = parseFloat(solution.selectedOption?.price || 0);
+                                        nextPayment += price * quantity;
+                                        ytdPayment += price * quantity * 12; // Annualized
+                                    } else if (solution.name === 'AI-Mobile - AI Assistant') {
+                                        nextPayment += 25 * quantity;
+                                        ytdPayment += 25 * quantity * 12;
+                                    } else if (solution.name === 'EduFlex - Uncapped Wireless') {
+                                        const price = parseFloat(solution.selectedOption?.price || 0);
+                                        nextPayment += price * quantity;
+                                        ytdPayment += price * quantity * 12;
+                                    } else if (solution.name === 'EduSchool - Education Fibre') {
+                                        const price = parseFloat(solution.selectedOption?.price || 0);
+                                        nextPayment += price * quantity;
+                                        ytdPayment += price * quantity * 12;
+                                    } else if (solution.name === 'Campus WiFi - Wireless Network') {
+                                        nextPayment += 450 * quantity;
+                                        ytdPayment += 450 * quantity * 12;
+                                    } else if (solution.name === 'EduSafe - PowerFleet Tracking') {
+                                        const price = parseFloat(solution.selectedOption?.price || 0);
+                                        nextPayment += price * quantity;
+                                        ytdPayment += price * quantity * 12;
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+                
+                document.getElementById('nextPayment').textContent = 'R ' + nextPayment.toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                document.getElementById('ytdPayments').textContent = 'R ' + ytdPayment.toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            }
+            
+            // Render activity table
+            function renderActivityTable() {
+                const builds = loadBuilds();
+                const tbody = document.getElementById('activityTableBody');
+                tbody.innerHTML = '';
+                
+                // Sort by last accessed (most recent first)
+                const sortedBuilds = [...builds].sort((a, b) => 
+                    new Date(b.lastAccessed) - new Date(a.lastAccessed)
+                ).slice(0, 6); // Show only 6 most recent
+                
+                sortedBuilds.forEach(build => {
+                    const row = document.createElement('tr');
+                    
+                    // Get first target and solution for display
+                    const firstTarget = build.data?.targets?.[0];
+                    const targetType = firstTarget?.type || 'N/A';
+                    const firstSolution = firstTarget?.solutions?.[0];
+                    const solutionName = firstSolution ? firstSolution.name.split(' - ')[0] : 'N/A';
+                    
+                    // Calculate amount (monthly recurring)
+                    let monthlyAmount = 0;
+                    if (build.data?.targets) {
+                        build.data.targets.forEach(target => {
+                            if (target.solutions) {
+                                target.solutions.forEach(solution => {
+                                    const quantity = solution.quantity || 1;
+                                    if (solution.name === 'EduStudent - Education Prepaid') {
+                                        monthlyAmount += parseFloat(solution.selectedOption?.price || 0) * quantity;
+                                    } else if (solution.name === 'AI-Mobile - AI Assistant') {
+                                        monthlyAmount += 25 * quantity;
+                                    } else if (solution.name === 'EduFlex - Uncapped Wireless') {
+                                        monthlyAmount += parseFloat(solution.selectedOption?.price || 0) * quantity;
+                                    } else if (solution.name === 'EduSchool - Education Fibre') {
+                                        monthlyAmount += parseFloat(solution.selectedOption?.price || 0) * quantity;
+                                    } else if (solution.name === 'Campus WiFi - Wireless Network') {
+                                        monthlyAmount += 450 * quantity;
+                                    } else if (solution.name === 'EduSafe - PowerFleet Tracking') {
+                                        monthlyAmount += parseFloat(solution.selectedOption?.price || 0) * quantity;
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    
+                    const date = new Date(build.lastAccessed);
+                    const formattedDate = date.toLocaleDateString('en-ZA', { month: 'short', day: 'numeric', year: 'numeric' });
+                    
+                    row.innerHTML = \`
+                        <td><strong>\${build.name || 'Untitled Solution'}</strong></td>
+                        <td>\${targetType}</td>
+                        <td>\${solutionName}</td>
+                        <td><span class="status-badge status-\${build.status}">\${build.status.charAt(0).toUpperCase() + build.status.slice(1)}</span></td>
+                        <td>R \${monthlyAmount.toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</td>
+                        <td>\${formattedDate}</td>
+                    \`;
+                    
+                    tbody.appendChild(row);
+                });
+                
+                if (sortedBuilds.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: #9CA3AF;">No solutions found</td></tr>';
+                }
+            }
+            
+            // Initialize charts
+            let monthlySpendChart = null;
+            let solutionProfileChart = null;
+            
+            function initCharts() {
+                // Monthly Spend Chart (Line Chart)
+                const monthlyCtx = document.getElementById('monthlySpendChart').getContext('2d');
+                monthlySpendChart = new Chart(monthlyCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
+                        datasets: [
+                            {
+                                label: 'EduStudent',
+                                data: [100, 120, 150, 155, 140],
+                                borderColor: '#FFCB00',
+                                backgroundColor: 'rgba(255, 203, 0, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'EduSchool',
+                                data: [80, 90, 110, 150, 130],
+                                borderColor: '#1E40AF',
+                                backgroundColor: 'rgba(30, 64, 175, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'EduFlex',
+                                data: [50, 60, 90, 100, 90],
+                                borderColor: '#10B981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + 'K';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Solution Profile Chart (Line Chart)
+                const solutionCtx = document.getElementById('solutionProfileChart').getContext('2d');
+                solutionProfileChart = new Chart(solutionCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
+                        datasets: [
+                            {
+                                label: 'EduStudent',
+                                data: [50, 80, 100, 150, 120],
+                                borderColor: '#FFCB00',
+                                backgroundColor: 'rgba(255, 203, 0, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'EduSchool',
+                                data: [60, 70, 90, 150, 130],
+                                borderColor: '#1E40AF',
+                                backgroundColor: 'rgba(30, 64, 175, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'EduFlex',
+                                data: [40, 50, 70, 100, 100],
+                                borderColor: '#10B981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Tab switching
+            function switchTab(tab) {
+                const tabs = document.querySelectorAll('.tab');
+                tabs.forEach(t => t.classList.remove('active'));
+                event.target.classList.add('active');
+                
+                // In a real implementation, this would filter the data
+                console.log('Switched to tab:', tab);
+            }
+            
+            // Filter functions
+            function filterBySolution(solution) {
+                console.log('Filter by solution:', solution);
+                // In a real implementation, this would filter the charts and table
+            }
+            
+            function filterByTarget(target) {
+                console.log('Filter by target:', target);
+                // In a real implementation, this would filter the charts and table
+            }
+            
+            // Initialize on load
+            document.addEventListener('DOMContentLoaded', function() {
+                calculateMetrics();
+                renderActivityTable();
+                initCharts();
+            });
         </script>
     </body>
     </html>
