@@ -936,17 +936,6 @@ app.get('/solution-builder', (c) => {
                 position: relative;
             }
             
-            .stepper::before {
-                content: '';
-                position: absolute;
-                top: 50%;
-                left: 5%;
-                right: 5%;
-                height: 2px;
-                background: #E5E7EB;
-                z-index: 0;
-            }
-            
             .stepper-step {
                 flex: 1;
                 display: flex;
@@ -2001,10 +1990,8 @@ app.get('/solution-builder', (c) => {
                     </button>
                     
                     <div class="logo-section">
-                        <div class="logo-icon">
-                            <i class="fas fa-network-wired"></i>
-                        </div>
-                        <span class="logo-text">EduConnect Solution Builder</span>
+                        <img src="/static/educonnect-logo.png" alt="EduConnect" class="logo-image" style="height: 32px; width: auto;">
+                        <span class="logo-text">Solution Builder</span>
                     </div>
                 </div>
                 <div class="header-right">
