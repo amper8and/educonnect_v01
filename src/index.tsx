@@ -646,23 +646,161 @@ app.get('/dashboard', (c) => {
         <title>Dashboard - EduConnect</title>
         <link href="/static/css/design-system.css" rel="stylesheet">
         <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: 'MTN Brighter Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                overflow: hidden;
+            }
+            
+            .dashboard-container {
+                position: relative;
+                width: 100vw;
+                height: 100vh;
+                background-image: url('/static/images/classroom-dashboard-bg.png');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+            }
+            
+            /* Overlay for better text readability */
+            .dashboard-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.2) 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .dashboard-card {
+                background: white;
+                border-radius: 1rem;
+                padding: 3rem;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                text-align: center;
+                max-width: 600px;
+                width: 90%;
+            }
+            
+            .logo-container {
+                margin-bottom: 2rem;
+            }
+            
+            .logo-container img {
+                height: 80px;
+                margin: 0 auto;
+            }
+            
+            .welcome-title {
+                font-size: 2rem;
+                font-weight: 700;
+                color: #000;
+                margin-bottom: 0.5rem;
+            }
+            
+            .welcome-subtitle {
+                font-size: 1.125rem;
+                color: #6B7280;
+                margin-bottom: 2rem;
+            }
+            
+            .button-group {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                margin-top: 2rem;
+            }
+            
+            .btn {
+                padding: 1rem 2rem;
+                border-radius: 0.5rem;
+                font-weight: 600;
+                font-size: 1rem;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s;
+                cursor: pointer;
+                border: none;
+            }
+            
+            .btn-primary {
+                background: #FFCB00;
+                color: #000;
+            }
+            
+            .btn-primary:hover {
+                background: #E6B800;
+                transform: translateY(-2px);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            }
+            
+            .btn-outline {
+                background: white;
+                color: #374151;
+                border: 2px solid #E5E7EB;
+            }
+            
+            .btn-outline:hover {
+                border-color: #FFCB00;
+                background: #FFFBEB;
+            }
+            
+            .btn-secondary {
+                background: #F3F4F6;
+                color: #6B7280;
+            }
+            
+            .btn-secondary:hover {
+                background: #E5E7EB;
+            }
+            
+            .btn i {
+                margin-right: 0.5rem;
+            }
+            
+            @media (max-width: 768px) {
+                .dashboard-card {
+                    padding: 2rem;
+                }
+                
+                .welcome-title {
+                    font-size: 1.5rem;
+                }
+                
+                .logo-container img {
+                    height: 60px;
+                }
+            }
+        </style>
     </head>
-    <body class="bg-gray-100">
-        <div class="container mx-auto p-8">
-            <div class="card text-center">
-                <img src="/static/images/logos/mtn-educonnect-logo.png" alt="EduConnect" style="height: 120px; margin: 0 auto 2rem;">
-                <h1 class="mb-4">Welcome to EduConnect!</h1>
-                <p class="text-secondary mb-6">Your education solutions portal</p>
-                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                    <a href="/solution-builder" class="btn btn-primary">
-                        <i class="fas fa-rocket mr-2"></i> Solution Builder
-                    </a>
-                    <a href="/onboarding" class="btn btn-outline">
-                        <i class="fas fa-user-check mr-2"></i> Complete Profile
-                    </a>
-                    <a href="/" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left mr-2"></i> Back to Login
-                    </a>
+    <body>
+        <div class="dashboard-container">
+            <div class="dashboard-overlay">
+                <div class="dashboard-card">
+                    <div class="logo-container">
+                        <img src="/static/images/logos/EduConnect_landscape_logo.png" alt="EduConnect">
+                    </div>
+                    <h1 class="welcome-title">Welcome to EduConnect!</h1>
+                    <p class="welcome-subtitle">Your education solutions portal</p>
+                    <div class="button-group">
+                        <a href="/solution-builder" class="btn btn-primary">
+                            <i class="fas fa-tools"></i> Solution Builder
+                        </a>
+                        <a href="/onboarding" class="btn btn-outline">
+                            <i class="fas fa-user-check"></i> Complete Profile
+                        </a>
+                        <a href="/" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Login
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
