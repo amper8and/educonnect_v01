@@ -2673,6 +2673,11 @@ app.get('/solution-builder', (c) => {
                 saveBuilds();
                 renderBuilds();
                 
+                // Update action buttons if we're viewing this build
+                if (buildId === currentBuildId) {
+                    renderActionButtons();
+                }
+                
                 console.log('📦 BUILD ARCHIVED');
                 console.log('Build:', build.name);
             }
@@ -3711,6 +3716,7 @@ app.get('/solution-builder', (c) => {
                 build.lastAccessed = new Date().toISOString();
                 autoSaveCurrent();
                 renderBuilds();
+                renderActionButtons();
                 
                 alert('✅ Build saved successfully!\\n\\nYour solution has been saved and can be accessed from the Recent History.');
                 console.log('💾 BUILD SAVED:', build.name);
@@ -3731,6 +3737,7 @@ app.get('/solution-builder', (c) => {
                 build.lastAccessed = new Date().toISOString();
                 autoSaveCurrent();
                 renderBuilds();
+                renderActionButtons();
                 
                 alert('📄 Offer Generated!\\\\n\\\\nBuild: ' + buildName + '\\\\nOnce-off: R ' + onceOff.toFixed(2) + '\\\\nMonthly: R ' + recurring.toFixed(2) + '\\\\n\\\\nStatus changed to OFFERED.\\\\n\\\\nA professional PDF offer document will be created for Account and Admin users.\\\\n\\\\n(PDF generation in development)');
                 console.log('📄 OFFER GENERATED - Status: offered');
@@ -3753,6 +3760,7 @@ app.get('/solution-builder', (c) => {
                     build.lastAccessed = new Date().toISOString();
                     autoSaveCurrent();
                     renderBuilds();
+                    renderActionButtons();
                     
                     alert('✅ Build Activated!\\\\n\\\\nStatus changed to ACTIVE.\\\\n\\\\nProceeding to checkout and payment flow.\\\\n\\\\n(Checkout feature in development)');
                     console.log('🚀 BUILD ACTIVATED - Status: active');
