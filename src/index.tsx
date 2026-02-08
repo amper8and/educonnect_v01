@@ -1990,7 +1990,7 @@ app.get('/solution-builder', (c) => {
                     </button>
                     
                     <div class="logo-section">
-                        <img src="/static/educonnect-logo.png" alt="EduConnect" class="logo-image" style="height: 32px; width: auto;">
+                        <img src="/static/images/logos/mtn-educonnect-logo.png" alt="EduConnect" class="logo-image" style="height: 32px; width: auto;">
                         <span class="logo-text">Solution Builder</span>
                     </div>
                 </div>
