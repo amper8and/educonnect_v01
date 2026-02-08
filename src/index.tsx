@@ -3815,6 +3815,12 @@ app.get('/reports', (c) => {
                 gap: 1.5rem;
             }
             
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: 1.5rem;
+            }
+            
             .logo-image {
                 height: 32px;
                 width: auto;
@@ -3824,6 +3830,56 @@ app.get('/reports', (c) => {
                 font-size: 1.5rem;
                 font-weight: 700;
                 color: #000;
+            }
+            
+            /* Navigation Links */
+            .nav-link {
+                padding: 0.5rem 1rem;
+                text-decoration: none;
+                color: #6B7280;
+                font-weight: 600;
+                font-size: 0.875rem;
+                transition: all 0.3s;
+                border-bottom: 3px solid transparent;
+            }
+            
+            .nav-link:hover {
+                color: #000;
+            }
+            
+            .nav-link.active {
+                color: #000;
+                border-bottom-color: #FFCB00;
+            }
+            
+            .icon-button {
+                width: 40px;
+                height: 40px;
+                border-radius: 0.5rem;
+                background: #F3F4F6;
+                border: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+            
+            .icon-button:hover {
+                background: #E5E7EB;
+            }
+            
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: #FFCB00;
+                color: #000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                font-size: 0.875rem;
             }
             
             .date-selector {
@@ -3849,6 +3905,129 @@ app.get('/reports', (c) => {
                 font-size: 0.875rem;
                 color: #374151;
                 cursor: pointer;
+            }
+            
+            /* Date Picker Modal */
+            .date-picker-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            }
+            
+            .date-picker-content {
+                background: white;
+                border-radius: 1rem;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+                width: 90%;
+                max-width: 400px;
+            }
+            
+            .date-picker-header {
+                padding: 1.5rem;
+                border-bottom: 1px solid #E5E7EB;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            
+            .date-picker-header h3 {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: #000;
+            }
+            
+            .close-btn {
+                width: 32px;
+                height: 32px;
+                border-radius: 0.5rem;
+                background: #F3F4F6;
+                border: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+            
+            .close-btn:hover {
+                background: #E5E7EB;
+            }
+            
+            .date-picker-body {
+                padding: 1.5rem;
+            }
+            
+            .date-input-group {
+                margin-bottom: 1rem;
+            }
+            
+            .date-input-group label {
+                display: block;
+                font-size: 0.875rem;
+                font-weight: 600;
+                color: #374151;
+                margin-bottom: 0.5rem;
+            }
+            
+            .date-input {
+                width: 100%;
+                padding: 0.75rem;
+                border: 1px solid #E5E7EB;
+                border-radius: 0.5rem;
+                font-size: 0.875rem;
+                transition: all 0.3s;
+            }
+            
+            .date-input:focus {
+                outline: none;
+                border-color: #FFCB00;
+                box-shadow: 0 0 0 3px rgba(255, 203, 0, 0.1);
+            }
+            
+            .date-picker-actions {
+                display: flex;
+                gap: 0.75rem;
+                margin-top: 1.5rem;
+            }
+            
+            .btn-primary {
+                flex: 1;
+                padding: 0.75rem 1.5rem;
+                background: #FFCB00;
+                color: #000;
+                border: none;
+                border-radius: 0.5rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+            
+            .btn-primary:hover {
+                background: #E6B800;
+                transform: translateY(-1px);
+            }
+            
+            .btn-secondary {
+                flex: 1;
+                padding: 0.75rem 1.5rem;
+                background: #F3F4F6;
+                color: #374151;
+                border: none;
+                border-radius: 0.5rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+            
+            .btn-secondary:hover {
+                background: #E5E7EB;
             }
             
             /* Key Metrics Bar */
@@ -4149,9 +4328,44 @@ app.get('/reports', (c) => {
                     <img src="/static/images/logos/EduConnect_landscape_logo.png" alt="EduConnect" class="logo-image">
                     <h1 class="report-title">Status Report</h1>
                 </div>
-                <div class="date-selector">
-                    <i class="fas fa-calendar"></i>
-                    <input type="text" id="dateRange" value="" readonly>
+                <div class="header-right">
+                    <a href="/dashboard" class="nav-link">Dashboard</a>
+                    <a href="/solution-builder" class="nav-link">Solutions</a>
+                    <a href="/reports" class="nav-link active">Reports</a>
+                    <div class="date-selector" onclick="toggleDatePicker()">
+                        <i class="fas fa-calendar"></i>
+                        <input type="text" id="dateRange" value="" readonly style="cursor: pointer;">
+                    </div>
+                    <button class="icon-button">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <div class="user-avatar">JM</div>
+                </div>
+            </div>
+            
+            <!-- Date Picker Modal -->
+            <div id="datePickerModal" class="date-picker-modal" style="display: none;">
+                <div class="date-picker-content">
+                    <div class="date-picker-header">
+                        <h3>Select Date Range</h3>
+                        <button onclick="closeDatePicker()" class="close-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="date-picker-body">
+                        <div class="date-input-group">
+                            <label>From:</label>
+                            <input type="date" id="dateFrom" class="date-input">
+                        </div>
+                        <div class="date-input-group">
+                            <label>To:</label>
+                            <input type="date" id="dateTo" class="date-input">
+                        </div>
+                        <div class="date-picker-actions">
+                            <button onclick="applyDateRange()" class="btn-primary">Apply</button>
+                            <button onclick="closeDatePicker()" class="btn-secondary">Cancel</button>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -4563,10 +4777,12 @@ app.get('/reports', (c) => {
                 // Set current month date range
                 setCurrentMonthDateRange();
                 
-                // Load and display data
-                calculateMetrics();
-                renderActivityTable();
-                initCharts();
+                // Load and display data with a small delay to ensure DOM is ready
+                setTimeout(function() {
+                    calculateMetrics();
+                    renderActivityTable();
+                    initCharts();
+                }, 100);
             });
             
             // Set current month date range
@@ -4587,8 +4803,70 @@ app.get('/reports', (c) => {
                 // Set the date range
                 const dateRangeInput = document.getElementById('dateRange');
                 if (dateRangeInput) {
-                    dateRangeInput.value = \`\${firstDayStr} - \${lastDayStr}\`;
+                    dateRangeInput.value = firstDayStr + ' - ' + lastDayStr;
                 }
+                
+                // Set date picker inputs
+                const dateFrom = document.getElementById('dateFrom');
+                const dateTo = document.getElementById('dateTo');
+                if (dateFrom) {
+                    dateFrom.value = firstDay.toISOString().split('T')[0];
+                }
+                if (dateTo) {
+                    dateTo.value = lastDay.toISOString().split('T')[0];
+                }
+            }
+            
+            // Date Picker Functions
+            function toggleDatePicker() {
+                const modal = document.getElementById('datePickerModal');
+                if (modal) {
+                    modal.style.display = modal.style.display === 'none' ? 'flex' : 'none';
+                }
+            }
+            
+            function closeDatePicker() {
+                const modal = document.getElementById('datePickerModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            }
+            
+            function applyDateRange() {
+                const dateFrom = document.getElementById('dateFrom').value;
+                const dateTo = document.getElementById('dateTo').value;
+                
+                if (!dateFrom || !dateTo) {
+                    alert('Please select both start and end dates');
+                    return;
+                }
+                
+                // Format the dates
+                const fromDate = new Date(dateFrom);
+                const toDate = new Date(dateTo);
+                
+                if (fromDate > toDate) {
+                    alert('Start date must be before end date');
+                    return;
+                }
+                
+                const options = { month: 'short', day: 'numeric', year: 'numeric' };
+                const fromStr = fromDate.toLocaleDateString('en-US', options);
+                const toStr = toDate.toLocaleDateString('en-US', options);
+                
+                // Update the date range display
+                const dateRangeInput = document.getElementById('dateRange');
+                if (dateRangeInput) {
+                    dateRangeInput.value = fromStr + ' - ' + toStr;
+                }
+                
+                // Close the modal
+                closeDatePicker();
+                
+                // Refresh the data (in a real implementation, this would filter based on date range)
+                console.log('Date range updated:', fromStr, '-', toStr);
+                calculateMetrics();
+                renderActivityTable();
             }
         </script>
     </body>
