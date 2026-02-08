@@ -2270,19 +2270,8 @@ app.get('/solution-builder', (c) => {
                                 <div style="font-size: 0.875rem; color: #6B7280; margin-top: 0.5rem;" id="commercials-term-note">Due on activation</div>
                             </div>
                             
-                            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                                <button onclick="saveBuild()" style="padding: 1rem; background: #F3F4F6; color: #000; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1rem;">
-                                    <i class="fas fa-save"></i> Save
-                                </button>
-                                <button onclick="generateOffer()" style="padding: 1rem; background: #F3F4F6; color: #000; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1rem;">
-                                    <i class="fas fa-file-invoice"></i> Generate Offer
-                                </button>
-                                <button onclick="activateBuild()" style="padding: 1rem; background: #FFCB00; color: #000; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1rem;">
-                                    <i class="fas fa-check-circle"></i> Activate
-                                </button>
-                                <button onclick="archiveCurrentBuild()" style="padding: 1rem; background: #6B7280; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1rem;">
-                                    <i class="fas fa-archive"></i> Archive
-                                </button>
+                            <div id="action-buttons-container" style="display: flex; flex-direction: column; gap: 1rem;">
+                                <!-- Buttons will be rendered dynamically -->
                             </div>
                         </div>
                     </div>
@@ -2335,7 +2324,7 @@ app.get('/solution-builder', (c) => {
             </div>
             
             <!-- Right Sidebar - AI Assistant -->
-            <div class="right-sidebar" id="right-sidebar">
+            <div class="right-sidebar collapsed" id="right-sidebar">
                 <div class="assistant-header">
                     <div class="assistant-info">
                         <div class="assistant-avatar">
@@ -2353,53 +2342,10 @@ app.get('/solution-builder', (c) => {
                 </div>
                 
                 <div class="chat-container">
-                    <div class="message">
-                        <div class="message-avatar">AI</div>
-                        <div>
-                            <div class="message-content">
-                                Hello! I see you're configuring a University site. Based on your student count of 2,500, would you like me to suggest bandwidth allocations?
-                                <div class="message-time">10:42 AM</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="message">
-                        <div class="message-avatar" style="background: #E5E7EB; color: #000;">You</div>
-                        <div>
-                            <div class="message-content" style="background: #FFCB00;">
-                                Yes, what's recommended for high video streaming usage?
-                                <div class="message-time">10:44 AM</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="message">
-                        <div class="message-avatar">AI</div>
-                        <div>
-                            <div class="message-content">
-                                For high-density streaming environments, we recommend a dedicated 1Gbps fiber link with redundancy. Here are two options:
-                                <div class="recommendation-card">
-                                    <div class="recommendation-title">
-                                        <i class="fas fa-lightbulb" style="color: #FFCB00;"></i>
-                                        Recommended Packages
-                                    </div>
-                                    <div class="recommendation-options">
-                                        <div class="recommendation-option">
-                                            <div class="option-title">Enterprise Dedicated</div>
-                                            <div class="option-detail">1:1 Contention • 99.9% SLA</div>
-                                        </div>
-                                        <div class="recommendation-option" style="border-left: 3px solid #FFCB00;">
-                                            <div class="option-title">Broadband Business <span style="color: #FFCB00;">✓ Best Performance</span></div>
-                                            <div class="option-detail">1:10 Contention • Standard SLA</div>
-                                        </div>
-                                    </div>
-                                    <div class="compare-link">
-                                        <a href="#">Compare SLAs</a> • <a href="#">Add backup link</a>
-                                    </div>
-                                </div>
-                                <div class="message-time">10:43 AM</div>
-                            </div>
-                        </div>
+                    <div style="padding: 2rem; text-align: center; color: #6B7280;">
+                        <i class="fas fa-comments" style="font-size: 3rem; color: #D1D5DB; margin-bottom: 1rem;"></i>
+                        <div style="font-size: 0.875rem; margin-bottom: 0.5rem;">AI Assistant</div>
+                        <div style="font-size: 0.75rem;">Ask me anything about your solution</div>
                     </div>
                 </div>
                 
@@ -3646,7 +3592,70 @@ app.get('/solution-builder', (c) => {
                 }
                 document.getElementById('commercials-term-note').textContent = termNote;
                 
+                // Render action buttons with status indicators
+                renderActionButtons();
+                
                 console.log('💰 COMMERCIALS RENDERED:', { onceOff, recurring: finalRecurring, billDue, term: selectedTerm });
+            }
+            
+            // Render action buttons with status indicators
+            function renderActionButtons() {
+                const container = document.getElementById('action-buttons-container');
+                if (!container) return;
+                
+                // Get current build status
+                const build = builds.find(b => b.id === currentBuildId);
+                const currentStatus = build ? build.status : 'saved';
+                
+                // Define button configurations
+                const buttons = [
+                    {
+                        label: 'Save',
+                        icon: 'fa-save',
+                        onClick: 'saveBuild()',
+                        status: 'saved',
+                        bgColor: '#F3F4F6',
+                        textColor: '#000'
+                    },
+                    {
+                        label: 'Generate Offer',
+                        icon: 'fa-file-invoice',
+                        onClick: 'generateOffer()',
+                        status: 'offered',
+                        bgColor: '#F3F4F6',
+                        textColor: '#000'
+                    },
+                    {
+                        label: 'Activate',
+                        icon: 'fa-check-circle',
+                        onClick: 'activateBuild()',
+                        status: 'active',
+                        bgColor: '#FFCB00',
+                        textColor: '#000'
+                    },
+                    {
+                        label: 'Archive',
+                        icon: 'fa-archive',
+                        onClick: 'archiveCurrentBuild()',
+                        status: 'archived',
+                        bgColor: '#6B7280',
+                        textColor: 'white'
+                    }
+                ];
+                
+                // Render buttons
+                container.innerHTML = buttons.map(btn => {
+                    const isCurrentStatus = currentStatus === btn.status;
+                    const indicator = isCurrentStatus 
+                        ? '<i class="fas fa-check-circle" style="margin-right: 0.5rem; color: #10B981;"></i>' 
+                        : '<i class="far fa-circle" style="margin-right: 0.5rem; color: #D1D5DB;"></i>';
+                    
+                    return '<button onclick="' + btn.onClick + '" style="padding: 1rem; background: ' + btn.bgColor + '; color: ' + btn.textColor + '; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;">' +
+                        indicator +
+                        '<i class="fas ' + btn.icon + '" style="margin-right: 0.5rem;"></i>' +
+                        btn.label +
+                        '</button>';
+                }).join('');
             }
             
             // Select contract term

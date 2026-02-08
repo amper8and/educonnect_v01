@@ -71,9 +71,16 @@
 - [ ] Discount code input
 - [ ] Discount code validation (EDUDEMO/LAUNCH10/PROMO5)
 - [ ] **Bill Due calculation**: Setup + 1st month (not annual)
-- [ ] Save Build action
-- [ ] Generate Offer action (placeholder)
-- [ ] Activate Build action (placeholder)
+- [ ] **Save Build action** - Updates status to 'saved'
+- [ ] **Generate Offer action** - Updates status to 'offered'
+- [ ] **Activate Build action** - Updates status to 'active'
+- [ ] **Archive button** - Archives active/offered builds
+- [ ] **Status badges** display correctly (Saved/Offered/Active/Archived)
+- [ ] **Status colors**:
+  - [ ] Saved - Green (#D1FAE5 / #065F46)
+  - [ ] Offered - Yellow (#FEF3C7 / #92400E)
+  - [ ] Active - Blue (#DBEAFE / #1E40AF)
+  - [ ] Archived - Gray (#E5E7EB / #374151)
 
 ### 7. UI Components - Desktop (>1024px)
 - [ ] Left Sidebar - Navigation
@@ -120,12 +127,15 @@
 6. ✅ **FIXED**: JavaScript syntax error in alert strings (Delivery 5)
 7. ✅ **FIXED**: AI chat panel not closing on desktop (inline styles issue)
 8. ✅ **FIXED**: Bill Due label and calculation (was Annual Total)
+9. ✅ **FIXED**: AI chat panel not expanding main content (grid layout)
+10. ✅ **FIXED**: Status not changing from Saved (status management implemented)
 
-### Current Status (Commit abb376e):
+### Current Status (Commit 4be809c):
 - All known issues resolved
 - Desktop and mobile AI chat panel working correctly
 - Bill Due showing correct amount (Setup + 1st month)
 - All 5 deliveries completed and functional
+- **Status management complete**: Saved → Offered → Active → Archived
 
 ## CSS Specificity Learnings
 
