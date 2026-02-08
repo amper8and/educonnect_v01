@@ -4151,7 +4151,7 @@ app.get('/reports', (c) => {
                 </div>
                 <div class="date-selector">
                     <i class="fas fa-calendar"></i>
-                    <input type="text" id="dateRange" value="Oct 1, 2023 - Oct 31, 2023" readonly>
+                    <input type="text" id="dateRange" value="" readonly>
                 </div>
             </div>
             
@@ -4291,6 +4291,7 @@ app.get('/reports', (c) => {
             // Calculate metrics
             function calculateMetrics() {
                 const builds = loadBuilds();
+                console.log('📊 calculateMetrics - Total builds:', builds.length);
                 
                 // Total solutions
                 const totalSolutions = builds.length;
@@ -4299,6 +4300,7 @@ app.get('/reports', (c) => {
                 // Activated solutions
                 const activatedSolutions = builds.filter(b => b.status === 'active').length;
                 document.getElementById('activatedSolutions').textContent = activatedSolutions;
+                console.log('📊 Activated solutions:', activatedSolutions);
                 
                 // Calculate next payment (sum of monthly recurring for active solutions)
                 let nextPayment = 0;
@@ -4348,13 +4350,23 @@ app.get('/reports', (c) => {
             // Render activity table
             function renderActivityTable() {
                 const builds = loadBuilds();
+                console.log('📊 renderActivityTable - Total builds:', builds.length);
+                console.log('📊 Builds data:', builds);
+                
                 const tbody = document.getElementById('activityTableBody');
+                if (!tbody) {
+                    console.error('❌ activityTableBody element not found!');
+                    return;
+                }
+                
                 tbody.innerHTML = '';
                 
                 // Sort by last accessed (most recent first)
                 const sortedBuilds = [...builds].sort((a, b) => 
                     new Date(b.lastAccessed) - new Date(a.lastAccessed)
                 ).slice(0, 6); // Show only 6 most recent
+                
+                console.log('📊 Sorted builds to display:', sortedBuilds.length);
                 
                 sortedBuilds.forEach(build => {
                     const row = document.createElement('tr');
@@ -4406,7 +4418,10 @@ app.get('/reports', (c) => {
                 });
                 
                 if (sortedBuilds.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: #9CA3AF;">No solutions found</td></tr>';
+                    console.log('⚠️ No builds found to display');
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: #9CA3AF;">No solutions found. Create your first solution in the Solution Builder!</td></tr>';
+                } else {
+                    console.log('✅ Activity table rendered with', sortedBuilds.length, 'rows');
                 }
             }
             
@@ -4544,10 +4559,36 @@ app.get('/reports', (c) => {
             
             // Initialize on load
             document.addEventListener('DOMContentLoaded', function() {
+                // Set current month date range
+                setCurrentMonthDateRange();
+                
+                // Load and display data
                 calculateMetrics();
                 renderActivityTable();
                 initCharts();
             });
+            
+            // Set current month date range
+            function setCurrentMonthDateRange() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = now.getMonth();
+                
+                // First day of current month
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                
+                // Format dates
+                const options = { month: 'short', day: 'numeric', year: 'numeric' };
+                const firstDayStr = firstDay.toLocaleDateString('en-US', options);
+                const lastDayStr = lastDay.toLocaleDateString('en-US', options);
+                
+                // Set the date range
+                const dateRangeInput = document.getElementById('dateRange');
+                if (dateRangeInput) {
+                    dateRangeInput.value = \`\${firstDayStr} - \${lastDayStr}\`;
+                }
+            }
         </script>
     </body>
     </html>
