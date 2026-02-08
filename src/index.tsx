@@ -692,7 +692,7 @@ app.get('/solution-builder', (c) => {
             
             .builder-container {
                 display: grid;
-                grid-template-columns: 240px 1fr 360px;
+                grid-template-columns: 240px 1fr auto;
                 grid-template-rows: 64px 1fr;
                 height: 100vh;
                 background: #F9FAFB;
@@ -1557,15 +1557,18 @@ app.get('/solution-builder', (c) => {
             
             /* Right Sidebar - AI Assistant */
             .right-sidebar {
+                width: 360px;
                 background: white;
                 border-left: 1px solid #E5E7EB;
                 display: flex;
                 flex-direction: column;
                 position: relative;
+                transition: width 0.3s ease;
             }
             
             .right-sidebar.collapsed {
                 width: 48px;
+                overflow: hidden;
             }
             
             .right-sidebar.collapsed .assistant-header,

@@ -65,8 +65,26 @@
 1. Panel starts expanded (360px)
 2. Click X → collapsed class added → panel 48px → FAB appears
 3. Click FAB → collapsed class removed → panel 360px → FAB hidden
+4. **Main content area expands to fill available space when collapsed**
+5. **No white space or visible chat text when collapsed**
 
 ### Mobile (≤1024px):
 1. Panel starts off-screen
 2. Click FAB → open class added → panel slides in → overlay appears
 3. Click X → open class removed → panel slides out → FAB appears
+
+## Layout Fix (Added):
+### Grid Layout Change:
+- **Before**: `grid-template-columns: 240px 1fr 360px;` (fixed 360px for right sidebar)
+- **After**: `grid-template-columns: 240px 1fr auto;` (auto-sizing for right sidebar)
+
+### Right Sidebar CSS:
+- **Default width**: `360px` (expanded state)
+- **Collapsed width**: `48px` (collapsed state)
+- **Transition**: `width 0.3s ease` (smooth animation)
+- **Overflow**: `hidden` (prevents text from showing when collapsed)
+
+### Result:
+- Main content area automatically expands when sidebar collapses
+- No visible chat text or white space when collapsed
+- Smooth transition animation
