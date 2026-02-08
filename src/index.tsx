@@ -4405,16 +4405,17 @@ app.get('/reports', (c) => {
                     const date = new Date(build.lastAccessed);
                     const formattedDate = date.toLocaleDateString('en-ZA', { month: 'short', day: 'numeric', year: 'numeric' });
                     
-                    row.innerHTML = \`
-                        <td><strong>\${build.name || 'Untitled Solution'}</strong></td>
-                        <td>\${targetType}</td>
-                        <td>\${solutionName}</td>
-                        <td><span class="status-badge status-\${build.status}">\${build.status.charAt(0).toUpperCase() + build.status.slice(1)}</span></td>
-                        <td>R \${monthlyAmount.toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</td>
-                        <td>\${formattedDate}</td>
-                    \`;
+                    // Create table cells
+                    row.innerHTML = 
+                        '<td><strong>' + (build.name || 'Untitled Solution') + '</strong></td>' +
+                        '<td>' + targetType + '</td>' +
+                        '<td>' + solutionName + '</td>' +
+                        '<td><span class="status-badge status-' + build.status + '">' + (build.status.charAt(0).toUpperCase() + build.status.slice(1)) + '</span></td>' +
+                        '<td>R ' + monthlyAmount.toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + '</td>' +
+                        '<td>' + formattedDate + '</td>';
                     
                     tbody.appendChild(row);
+                    console.log('✅ Added row:', build.name || 'Untitled Solution');
                 });
                 
                 if (sortedBuilds.length === 0) {
